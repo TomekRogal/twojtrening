@@ -4,7 +4,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <html>
-<jsp:include page="/wid/head.jsp"/>
+<jsp:include page="../sharedview/head.jsp"/>
 <body class="bg-primary">
 <div id="layoutAuthentication">
     <div id="layoutAuthentication_content">
@@ -38,7 +38,7 @@
         </main>
     </div>
     <div id="layoutAuthentication_footer">
-        <jsp:include page="/wid/footer.jsp"/>
+        <jsp:include page="../sharedview/footer.jsp"/>
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"

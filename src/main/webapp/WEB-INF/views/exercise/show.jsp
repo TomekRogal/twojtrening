@@ -5,11 +5,11 @@
            uri="http://www.springframework.org/tags/form" %>
 <script type="text/javascript" src='<c:url value="/js/delete.js"/>'></script>
 <html>
-<jsp:include page="/wid/head.jsp"/>
+<jsp:include page="../sharedview/head.jsp"/>
 <body class="sb-nav-fixed">
-<jsp:include page="/wid/menuup.jsp"/>
+<jsp:include page="../sharedview/menuup.jsp"/>
 <div id="layoutSidenav">
-    <jsp:include page="/wid/menuleft.jsp"/>
+    <jsp:include page="../sharedview/menuleft.jsp"/>
     <div id="layoutSidenav_content">
         <div class="card mb-4 ">
             <div class="ms-auto px-2 mt-5">
@@ -30,9 +30,9 @@
             </div>
             <div class="card-body text-center w-25 mx-auto">${exercise.description}</div>
         </div>
-        <jsp:include page="/wid/footer.jsp"/>
+        <jsp:include page="../sharedview/footer.jsp"/>
     </div>
 </div>
-<jsp:include page="/wid/scripts.jsp"/>
+<jsp:include page="../sharedview/scripts.jsp"/>
 </body>
 </html>

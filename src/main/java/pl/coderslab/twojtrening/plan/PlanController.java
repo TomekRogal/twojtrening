@@ -21,32 +21,20 @@ import java.util.Map;
 
 @Controller
 public class PlanController {
-    private final PlanRepository planRepository;
-    private final PlanTrainingRepository planTrainingRepository;
-    private final TrainingExerciseRepository trainingExerciseRepository;
-
-
-    public PlanController(PlanRepository planRepository, PlanTrainingRepository planTrainingRepository, TrainingExerciseRepository trainingExerciseRepository) {
-        this.planRepository = planRepository;
-        this.planTrainingRepository = planTrainingRepository;
-        this.trainingExerciseRepository = trainingExerciseRepository;
+    private final PlanService planService;
+    public PlanController(PlanService planService) {
+        this.planService = planService;
     }
 
     @RequestMapping("/plan/all")
     public String findAll(@AuthenticationPrincipal CurrentUser customUser, Model model) {
-        model.addAttribute("plans", planRepository.findByUser(customUser.getUser()));
+        model.addAttribute("plans", planService.findAllPlansFromUser(customUser.getUser()));
         return "plan/all";
     }
 
     @RequestMapping("/plan/delete/{id}")
     public String delete(@PathVariable Long id, @AuthenticationPrincipal CurrentUser customUser) {
-        if (planRepository.findById(id).isPresent()) {
-            if (planRepository.findById(id).get().getUser().getId().equals(customUser.getUser().getId())) {
-                planTrainingRepository.deleteAllFromPlan(planRepository.findById(id).get());
-                planRepository.deleteById(id);
-                return "redirect:/plan/all";
-            }
-        }
+        planService.deletePlanById(id);
         return "redirect:/plan/all";
     }
 
@@ -63,21 +51,15 @@ public class PlanController {
         if (bindingResult.hasErrors()) {
             return "plan/add";
         }
-        if(plan.getUser().getId().equals(customUser.getUser().getId())){
-            planRepository.save(plan);
-        }
+        planService.addPlan(plan);
         return "redirect:/plan/all";
     }
 
     @GetMapping("/plan/edit/{id}")
     public String edit(@PathVariable Long id, Model model, @AuthenticationPrincipal CurrentUser customUser) {
-        if (planRepository.findById(id).isPresent()) {
-            if (planRepository.findById(id).get().getUser().getId().equals(customUser.getUser().getId())) {
-                model.addAttribute("plan", planRepository.findById(id).get());
-                return "plan/edit";
-            }
-        }
-        return "redirect:/plan/all";
+        model.addAttribute("plan", planService.getSinglePlanById(id));
+        return "plan/edit";
+
     }
 
     @PostMapping("/plan/edit/{id}")
@@ -85,24 +67,14 @@ public class PlanController {
         if (bindingResult.hasErrors()) {
             return "plan/edit";
         }
-        if(plan.getUser().getId().equals(customUser.getUser().getId())) {
-            planRepository.save(plan);
-        }
+        planService.addPlan(plan);
         return "redirect:/plan/all";
     }
 
     @GetMapping("/plan/show/{id}")
     public String show(@PathVariable Long id, Model model, @AuthenticationPrincipal CurrentUser customUser) {
-        if (planRepository.findById(id).isPresent()) {
-            if (planRepository.findById(id).get().getUser().getId().equals(customUser.getUser().getId())) {
-                model.addAttribute("plan", planRepository.findById(id).get());
-                Map<PlanTraining, List<TrainingExercise>> te = new LinkedHashMap<>();
-                List<PlanTraining> allTrainingsFromPlan = planTrainingRepository.findAllTrainingsFromPlan(planRepository.findById(id).get());
-                allTrainingsFromPlan.forEach(e -> te.put(e, trainingExerciseRepository.findAllExercisesFromTraining(e.getTraining())));
-                model.addAttribute("trainingsList", te);
+                model.addAttribute("plan", planService.getSinglePlanById(id));
+                model.addAttribute("trainingsList", planService.getSinglePlanWithTrainingsAndExercisesById(id));
                 return "plan/show";
-            }
-        }
-        return "redirect:/plan/all";
     }
 }

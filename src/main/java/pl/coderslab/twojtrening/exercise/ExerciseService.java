@@ -17,15 +17,15 @@ public class ExerciseService {
     public List<Exercise> getAllExercises() {
         return exerciseRepository.findAll();
     }
-    public Exercise addExercise(Exercise exercise) {
-        return exerciseRepository.save(exercise);
+    public void addExercise(Exercise exercise) {
+         exerciseRepository.save(exercise);
     }
     public Exercise getSingleExerciseById(Long id) {
-        return exerciseRepository.findById(id).orElseThrow(() -> new NotFoundException("Nie znaleziono ćwiczenia o id: " + id));
+        return exerciseRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Exercise with id:%s not found",id)));
     }
 
     public void deleteExerciseById (Long id) {
-        Exercise exercise = exerciseRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        Exercise exercise = exerciseRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Exercise with id:%s not found",id)));
         exerciseRepository.deleteById(exercise.getId());
     }
 

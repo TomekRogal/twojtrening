@@ -65,8 +65,8 @@ public class UserController {
         if(userRepository.findById(id).isPresent()){
             User user = userRepository.findById(id).get();
             if(user.getEnabled()==0){
-                planRepository.deleteAllFromUser(user);
-                trainingRepository.deleteAllFromUser(user);
+                planRepository.deleteAllPlansFromUser(user);
+                trainingRepository.deleteAllTrainingsFromUser(user);
                 userRepository.deleteById(user.getId());
             }
         }

@@ -1,6 +1,7 @@
 package pl.coderslab.twojtrening.exercise;
 
 import org.springframework.stereotype.Service;
+import pl.coderslab.twojtrening.error.NotFoundException;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
@@ -20,7 +21,7 @@ public class ExerciseService {
         return exerciseRepository.save(exercise);
     }
     public Exercise getSingleExerciseById(Long id) {
-        return exerciseRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        return exerciseRepository.findById(id).orElseThrow(() -> new NotFoundException("Nie znaleziono ćwiczenia o id: " + id));
     }
 
     public void deleteExerciseById (Long id) {

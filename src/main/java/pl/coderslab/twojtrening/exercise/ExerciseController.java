@@ -13,26 +13,21 @@ import javax.validation.Valid;
 
 @Controller
 public class ExerciseController {
-    private final ExerciseRepository exerciseRepository;
+    private final ExerciseService exerciseService;
 
-    public ExerciseController(ExerciseRepository exerciseRepository) {
-        this.exerciseRepository = exerciseRepository;
+    public ExerciseController(ExerciseService exerciseService) {
+        this.exerciseService = exerciseService;
     }
 
     @RequestMapping("/exercise/all")
     public String findAll(Model model) {
-        model.addAttribute("exercises", exerciseRepository.findAll());
+        model.addAttribute("exercises", exerciseService.getAllExercises());
         return "exercise/all";
     }
 
     @RequestMapping("/exercises/delete/{id}")
-    public String delete(@PathVariable Long id, Model model) {
-        try {
-            exerciseRepository.deleteById(id);
-            return "redirect:/exercise/all";
-        } catch (Exception e) {
-            model.addAttribute("delete", "failed");
-        }
+    public String delete(@PathVariable Long id) {
+        exerciseService.deleteExerciseById(id);
         return "forward:/exercise/all";
     }
 
@@ -47,17 +42,14 @@ public class ExerciseController {
         if (bindingResult.hasErrors()) {
             return "exercise/add";
         }
-        exerciseRepository.save(exercise);
+        exerciseService.addExercise(exercise);
         return "redirect:/exercise/all";
     }
 
     @GetMapping("/exercises/edit/{id}")
     public String edit(@PathVariable Long id, Model model) {
-        if (exerciseRepository.findById(id).isPresent()) {
-            model.addAttribute("exercise", exerciseRepository.findById(id).get());
+            model.addAttribute("exercise", exerciseService.getSingleExerciseById(id));
             return "exercise/edit";
-        }
-        return "redirect:/exercise/all";
     }
 
     @PostMapping("/exercises/edit/{id}")
@@ -65,17 +57,14 @@ public class ExerciseController {
         if (bindingResult.hasErrors()) {
             return "exercise/edit";
         }
-        exerciseRepository.save(exercise);
+        exerciseService.addExercise(exercise);
         return "redirect:/exercise/all";
     }
 
     @GetMapping("/exercise/show/{id}")
     public String show(@PathVariable Long id, Model model) {
-        if (exerciseRepository.findById(id).isPresent()) {
-            model.addAttribute("exercise", exerciseRepository.findById(id).get());
+            model.addAttribute("exercise", exerciseService.getSingleExerciseById(id));
             return "exercise/show";
-        }
-        return "redirect:/exercise/all";
     }
 }
 

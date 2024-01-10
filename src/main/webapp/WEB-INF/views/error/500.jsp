@@ -1,8 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
-<jsp:include page="/wid/head.jsp"/>
-<head>
-</head>
+<jsp:include page="../sharedview/head.jsp"/>
 <body>
 <div id="layoutError">
     <div id="layoutError_content">
@@ -24,7 +22,7 @@
         </main>
     </div>
     <div id="layoutError_footer">
-        <jsp:include page="/wid/footer.jsp"/>
+        <jsp:include page="../sharedview/footer.jsp"/>
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"

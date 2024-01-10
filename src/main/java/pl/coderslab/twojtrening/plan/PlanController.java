@@ -8,20 +8,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import pl.coderslab.twojtrening.plantraining.PlanTraining;
-import pl.coderslab.twojtrening.plantraining.PlanTrainingRepository;
-import pl.coderslab.twojtrening.trainingexercise.TrainingExercise;
-import pl.coderslab.twojtrening.trainingexercise.TrainingExerciseRepository;
 import pl.coderslab.twojtrening.user.CurrentUser;
 
 import javax.validation.Valid;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 @Controller
 public class PlanController {
     private final PlanService planService;
+
     public PlanController(PlanService planService) {
         this.planService = planService;
     }
@@ -73,8 +67,8 @@ public class PlanController {
 
     @GetMapping("/plan/show/{id}")
     public String show(@PathVariable Long id, Model model, @AuthenticationPrincipal CurrentUser customUser) {
-                model.addAttribute("plan", planService.getSinglePlanById(id));
-                model.addAttribute("trainingsList", planService.getSinglePlanWithTrainingsAndExercisesById(id));
-                return "plan/show";
+        model.addAttribute("plan", planService.getSinglePlanById(id));
+        model.addAttribute("trainingsList", planService.getSinglePlanWithTrainingsAndExercisesById(id));
+        return "plan/show";
     }
 }

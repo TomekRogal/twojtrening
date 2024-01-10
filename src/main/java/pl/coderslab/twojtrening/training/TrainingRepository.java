@@ -15,5 +15,5 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
     @Modifying
     @Transactional
     @Query("delete Training t where t.user = ?1")
-    int deleteAllTrainingsFromUser(User user);
+    void deleteAllTrainingsFromUser(User user);
 }

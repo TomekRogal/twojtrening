@@ -15,6 +15,6 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
     @Modifying
     @Transactional
     @Query("delete Plan p where p.user = ?1")
-    int deleteAllPlansFromUser(User user);
+    void deleteAllPlansFromUser(User user);
 }
 

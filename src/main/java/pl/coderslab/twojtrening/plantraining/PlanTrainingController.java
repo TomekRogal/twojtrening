@@ -7,8 +7,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import pl.coderslab.twojtrening.dayname.DayName;
 import pl.coderslab.twojtrening.dayname.DayNameRepository;
+import pl.coderslab.twojtrening.dayname.DayNameService;
 import pl.coderslab.twojtrening.plan.Plan;
 import pl.coderslab.twojtrening.plan.PlanRepository;
+import pl.coderslab.twojtrening.plan.PlanService;
 import pl.coderslab.twojtrening.training.TrainingRepository;
 import pl.coderslab.twojtrening.user.CurrentUser;
 
@@ -21,18 +23,22 @@ public class PlanTrainingController {
     private final TrainingRepository trainingRepository;
     private final DayNameRepository dayNameRepository;
     private final PlanRepository planRepository;
+    private final DayNameService dayNameService;
+    private final PlanService planService;
 
 
-    public PlanTrainingController(PlanTrainingRepository planTrainingRepository, TrainingRepository trainingRepository, DayNameRepository dayNameRepository, PlanRepository planRepository) {
+    public PlanTrainingController(PlanTrainingRepository planTrainingRepository, TrainingRepository trainingRepository, DayNameRepository dayNameRepository, PlanRepository planRepository, DayNameService dayNameService, PlanService planService) {
         this.planTrainingRepository = planTrainingRepository;
         this.trainingRepository = trainingRepository;
         this.dayNameRepository = dayNameRepository;
         this.planRepository = planRepository;
+        this.dayNameService = dayNameService;
+        this.planService = planService;
     }
 
     @ModelAttribute("days")
     public List<DayName> dayNames() {
-        return dayNameRepository.findAll();
+        return dayNameService.findAllDaysNames();
     }
 
     @ModelAttribute("plans")

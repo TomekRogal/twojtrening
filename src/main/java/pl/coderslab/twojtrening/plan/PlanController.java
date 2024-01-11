@@ -28,7 +28,7 @@ public class PlanController {
 
     @RequestMapping("/plan/delete/{id}")
     public String delete(@PathVariable Long id, @AuthenticationPrincipal CurrentUser customUser) {
-        planService.deletePlanById(id);
+        planService.deletePlanById(id, customUser.getUser());
         return "redirect:/plan/all";
     }
 
@@ -41,7 +41,7 @@ public class PlanController {
     }
 
     @PostMapping("/plan/add")
-    public String addProcess(@AuthenticationPrincipal CurrentUser customUser, @Valid Plan plan, BindingResult bindingResult) {
+    public String addProcess(@Valid Plan plan, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "plan/add";
         }
@@ -51,13 +51,13 @@ public class PlanController {
 
     @GetMapping("/plan/edit/{id}")
     public String edit(@PathVariable Long id, Model model, @AuthenticationPrincipal CurrentUser customUser) {
-        model.addAttribute("plan", planService.getSinglePlanById(id));
+        model.addAttribute("plan", planService.getSinglePlanById(id, customUser.getUser()));
         return "plan/edit";
 
     }
 
     @PostMapping("/plan/edit/{id}")
-    public String editProcess(@Valid Plan plan, BindingResult bindingResult, @AuthenticationPrincipal CurrentUser customUser) {
+    public String editProcess(@Valid Plan plan, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "plan/edit";
         }
@@ -67,8 +67,8 @@ public class PlanController {
 
     @GetMapping("/plan/show/{id}")
     public String show(@PathVariable Long id, Model model, @AuthenticationPrincipal CurrentUser customUser) {
-        model.addAttribute("plan", planService.getSinglePlanById(id));
-        model.addAttribute("trainingsList", planService.getSinglePlanWithTrainingsAndExercisesById(id));
+        model.addAttribute("plan", planService.getSinglePlanById(id, customUser.getUser()));
+        model.addAttribute("trainingsList", planService.getSinglePlanWithTrainingsAndExercisesById(id, customUser.getUser()));
         return "plan/show";
     }
 }

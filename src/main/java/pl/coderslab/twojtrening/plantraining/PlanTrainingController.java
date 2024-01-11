@@ -6,10 +6,12 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import pl.coderslab.twojtrening.dayname.DayName;
-import pl.coderslab.twojtrening.dayname.DayNameRepository;
+import pl.coderslab.twojtrening.dayname.DayNameService;
 import pl.coderslab.twojtrening.plan.Plan;
 import pl.coderslab.twojtrening.plan.PlanRepository;
+import pl.coderslab.twojtrening.plan.PlanService;
 import pl.coderslab.twojtrening.training.TrainingRepository;
+import pl.coderslab.twojtrening.training.TrainingService;
 import pl.coderslab.twojtrening.user.CurrentUser;
 
 import javax.validation.Valid;
@@ -19,39 +21,38 @@ import java.util.List;
 public class PlanTrainingController {
     private final PlanTrainingRepository planTrainingRepository;
     private final TrainingRepository trainingRepository;
-    private final DayNameRepository dayNameRepository;
     private final PlanRepository planRepository;
+    private final DayNameService dayNameService;
+    private final PlanService planService;
+    private final TrainingService trainingService;
 
 
-    public PlanTrainingController(PlanTrainingRepository planTrainingRepository, TrainingRepository trainingRepository, DayNameRepository dayNameRepository, PlanRepository planRepository) {
+    public PlanTrainingController(PlanTrainingRepository planTrainingRepository, TrainingRepository trainingRepository, PlanRepository planRepository, DayNameService dayNameService, PlanService planService, TrainingService trainingService) {
         this.planTrainingRepository = planTrainingRepository;
         this.trainingRepository = trainingRepository;
-        this.dayNameRepository = dayNameRepository;
         this.planRepository = planRepository;
+        this.dayNameService = dayNameService;
+        this.planService = planService;
+        this.trainingService = trainingService;
     }
 
     @ModelAttribute("days")
     public List<DayName> dayNames() {
-        return dayNameRepository.findAll();
+        return dayNameService.findAllDaysNames();
     }
 
-    @ModelAttribute("plans")
-    public List<Plan> plans() {
-        return planRepository.findAll();
-    }
+//    @ModelAttribute("plans")
+//    public List<Plan> plans() {
+//        return planRepository.findAll();
+//    }
 
     @GetMapping("/plan/training/add/{id}")
     public String add(@AuthenticationPrincipal CurrentUser customUser, @PathVariable Long id, Model model) {
-        if (planRepository.findById(id).isPresent()) {
-            if (planRepository.findById(id).get().getUser().getId().equals(customUser.getUser().getId())) {
                 PlanTraining planTraining = new PlanTraining();
-                planTraining.setPlan(planRepository.findById(id).get());
-                model.addAttribute("trainings", trainingRepository.findByUser(customUser.getUser()));
+                planTraining.setPlan(planService.getSinglePlanById(id,customUser.getUser()));
+                model.addAttribute("trainings", trainingService.findAllTrainingsFromUser(customUser.getUser()));
                 model.addAttribute("planTraining", planTraining);
                 return "plantraining/add";
-            }
-        }
-        return "redirect:/plan/all";
     }
 
     @PostMapping("/plan/training/add")

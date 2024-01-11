@@ -16,34 +16,22 @@ import javax.validation.Valid;
 
 @Controller
 public class TrainingController {
-    private final TrainingRepository trainingRepository;
-    private final TrainingExerciseRepository trainingExerciseRepository;
+    private final TrainingService trainingService;
 
-
-    public TrainingController(TrainingRepository exerciseRepository, TrainingExerciseRepository trainingExerciseRepository) {
-        this.trainingRepository = exerciseRepository;
-
-        this.trainingExerciseRepository = trainingExerciseRepository;
+    public TrainingController(TrainingService trainingService) {
+        this.trainingService = trainingService;
     }
 
     @RequestMapping("/training/all")
     public String findAll(@AuthenticationPrincipal CurrentUser customUser, Model model) {
-        model.addAttribute("trainings", trainingRepository.findByUser(customUser.getUser()));
+        model.addAttribute("trainings", trainingService.findAllTrainingsFromUser(customUser.getUser()));
         return "training/all";
     }
 
     @RequestMapping("/training/delete/{id}")
-    public String delete(@PathVariable Long id, Model model, @AuthenticationPrincipal CurrentUser customUser) {
-        try {
-            if (trainingRepository.findById(id).get().getUser().getId().equals(customUser.getUser().getId())) {
-                trainingExerciseRepository.deleteAllFromTraining(trainingRepository.findById(id).get());
-                trainingRepository.deleteById(id);
-            }
-            return "redirect:/training/all";
-        } catch (Exception e) {
-            model.addAttribute("delete", "failed");
-        }
-        return "forward:/training/all";
+    public String delete(@PathVariable Long id, @AuthenticationPrincipal CurrentUser customUser) {
+        trainingService.deleteTrainingById(id, customUser.getUser());
+        return "redirect:/training/all";
     }
 
 
@@ -60,21 +48,15 @@ public class TrainingController {
         if (bindingResult.hasErrors()) {
             return "training/add";
         }
-        if(training.getUser().getId().equals(customUser.getUser().getId())){
-            trainingRepository.save(training);
-        }
+         trainingService.addTraining(training);
         return "redirect:/training/all";
     }
 
     @GetMapping("/training/edit/{id}")
     public String edit(@AuthenticationPrincipal CurrentUser customUser, @PathVariable Long id, Model model) {
-        if (trainingRepository.findById(id).isPresent()) {
-            if (trainingRepository.findById(id).get().getUser().getId().equals(customUser.getUser().getId())) {
-                model.addAttribute("training", trainingRepository.findById(id).get());
+                model.addAttribute("training", trainingService.getSingleTrainingById(id,customUser.getUser()));
                 return "training/edit";
-            }
-        }
-        return "redirect:/training/all";
+
     }
 
     @PostMapping("/training/edit/{id}")
@@ -82,22 +64,16 @@ public class TrainingController {
         if (bindingResult.hasErrors()) {
             return "training/edit";
         }
-        if(training.getUser().getId().equals(customUser.getUser().getId())) {
-            trainingRepository.save(training);
-        }
+        trainingService.addTraining(training);
         return "redirect:/training/all";
     }
 
     @GetMapping("/training/show/{id}")
     public String show(@PathVariable Long id, Model model, @AuthenticationPrincipal CurrentUser customUser) {
-        if (trainingRepository.findById(id).isPresent()) {
-            if (trainingRepository.findById(id).get().getUser().getId().equals(customUser.getUser().getId())) {
-                model.addAttribute("training", trainingRepository.findById(id).get());
-                model.addAttribute("exercises", trainingExerciseRepository.findAllExercisesFromTraining(trainingRepository.findById(id).get()));
-                return "training/show";
-            }
-        }
-        return "redirect:/training/all";
+        Training training = trainingService.getSingleTrainingById(id,customUser.getUser());
+        model.addAttribute("training", training);
+        model.addAttribute("exercises", trainingService.findAllExerciseFromTraining(training));
+        return "training/show";
     }
 
 }

@@ -21,7 +21,7 @@ public class ExerciseController {
 
     @RequestMapping("/exercise/all")
     public String findAll(Model model) {
-        model.addAttribute("exercises", exerciseService.getAllExercises());
+        model.addAttribute("exercises", exerciseService.findAllExercises());
         return "exercise/all";
     }
 

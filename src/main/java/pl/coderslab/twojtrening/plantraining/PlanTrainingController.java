@@ -7,9 +7,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import pl.coderslab.twojtrening.dayname.DayName;
 import pl.coderslab.twojtrening.dayname.DayNameService;
-import pl.coderslab.twojtrening.plan.PlanRepository;
 import pl.coderslab.twojtrening.plan.PlanService;
-import pl.coderslab.twojtrening.training.TrainingRepository;
 import pl.coderslab.twojtrening.training.TrainingService;
 import pl.coderslab.twojtrening.user.CurrentUser;
 
@@ -36,22 +34,18 @@ public class PlanTrainingController {
         return dayNameService.findAllDaysNames();
     }
 
-//    @ModelAttribute("plans")
-//    public List<Plan> plans() {
-//        return planRepository.findAll();
-//    }
 
     @GetMapping("/plan/training/add/{id}")
     public String add(@AuthenticationPrincipal CurrentUser customUser, @PathVariable Long id, Model model) {
-                PlanTraining planTraining = new PlanTraining();
-                planTraining.setPlan(planService.getSinglePlanById(id,customUser.getUser()));
-                model.addAttribute("trainings", trainingService.findAllTrainingsFromUser(customUser.getUser()));
-                model.addAttribute("planTraining", planTraining);
-                return "plantraining/add";
+        PlanTraining planTraining = new PlanTraining();
+        planTraining.setPlan(planService.getSinglePlanById(id, customUser.getUser()));
+        model.addAttribute("trainings", trainingService.findAllTrainingsFromUser(customUser.getUser()));
+        model.addAttribute("planTraining", planTraining);
+        return "plantraining/add";
     }
 
     @PostMapping("/plan/training/add")
-    public String addProcess(@Valid PlanTraining planTraining, BindingResult bindingResult, @AuthenticationPrincipal CurrentUser customUser) {
+    public String addProcess(@Valid PlanTraining planTraining, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "plantraining/add";
         }
@@ -63,7 +57,6 @@ public class PlanTrainingController {
     public String delete(@PathVariable Long id, @AuthenticationPrincipal CurrentUser customUser) {
         Long planId = planTrainingService.deleteTrainingFromPlan(id, customUser.getUser());
         return "redirect:/plan/show/" + planId;
-
     }
 
     @GetMapping("/plan/training/edit/{id}")
@@ -71,11 +64,10 @@ public class PlanTrainingController {
         model.addAttribute("planTraining", planTrainingService.getSinglePlanWithTrainingsById(id, customUser.getUser()));
         model.addAttribute("trainings", trainingService.findAllTrainingsFromUser(customUser.getUser()));
         return "plantraining/edit";
-
     }
 
     @PostMapping("/plan/training/edit")
-    public String editProcess(@Valid PlanTraining planTraining, BindingResult bindingResult, @AuthenticationPrincipal CurrentUser customUser) {
+    public String editProcess(@Valid PlanTraining planTraining, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "plantraining/edit";
         }

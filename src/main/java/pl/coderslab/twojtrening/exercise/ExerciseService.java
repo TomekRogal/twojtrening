@@ -14,7 +14,7 @@ public class ExerciseService {
         this.exerciseRepository = exerciseRepository;
     }
 
-    public List<Exercise> getAllExercises() {
+    public List<Exercise> findAllExercises() {
         return exerciseRepository.findAll();
     }
 

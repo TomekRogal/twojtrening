@@ -47,7 +47,7 @@ public class PlanService {
         Plan plan = planRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("Plan with id:%s not found", id)));
         if(!plan.getUser().getId().equals(user.getId())){
-            throw new AccessUserException("Brak dostępu");
+            throw new AccessUserException("Access forbidden");
         }
         return plan;
     }
@@ -55,7 +55,7 @@ public class PlanService {
         Plan plan = planRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("Plan with id:%s not found", id)));
         if(!plan.getUser().getId().equals(user.getId())){
-            throw new AccessUserException("Brak dostępu");
+            throw new AccessUserException("Access forbidden");
         }
         Map<PlanTraining, List<TrainingExercise>> planTrainingListLinkedHashMap = new LinkedHashMap<>();
         planTrainingRepository.findAllTrainingsFromPlan(plan)

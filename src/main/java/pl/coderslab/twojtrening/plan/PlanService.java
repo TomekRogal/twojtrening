@@ -1,6 +1,7 @@
 package pl.coderslab.twojtrening.plan;
 
 import org.springframework.stereotype.Service;
+import pl.coderslab.twojtrening.error.AccessUserException;
 import pl.coderslab.twojtrening.error.NotFoundException;
 import pl.coderslab.twojtrening.plantraining.PlanTraining;
 import pl.coderslab.twojtrening.plantraining.PlanTrainingRepository;
@@ -28,9 +29,12 @@ public class PlanService {
         return planRepository.findByUser(user);
     }
 
-    public void deletePlanById(Long id) {
+    public void deletePlanById(Long id, User user) {
         Plan plan = planRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("Plan with id:%s not found", id)));
+        if(!plan.getUser().getId().equals(user.getId())){
+            throw new AccessUserException("Access forbidden");
+        }
         planTrainingRepository.deleteAllFromPlan(plan);
         planRepository.deleteById(plan.getId());
     }
@@ -39,18 +43,25 @@ public class PlanService {
         planRepository.save(plan);
     }
 
-    public Plan getSinglePlanById(Long id) {
+    public Plan getSinglePlanById(Long id, User user) {
         Plan plan = planRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("Plan with id:%s not found", id)));
+        if(!plan.getUser().getId().equals(user.getId())){
+            throw new AccessUserException("Access forbidden");
+        }
         return plan;
     }
-    public Map<PlanTraining, List<TrainingExercise>> getSinglePlanWithTrainingsAndExercisesById (Long id) {
+    public Map<PlanTraining, List<TrainingExercise>> getSinglePlanWithTrainingsAndExercisesById (Long id, User user) {
         Plan plan = planRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("Plan with id:%s not found", id)));
+        if(!plan.getUser().getId().equals(user.getId())){
+            throw new AccessUserException("Access forbidden");
+        }
         Map<PlanTraining, List<TrainingExercise>> planTrainingListLinkedHashMap = new LinkedHashMap<>();
-        List<PlanTraining> allTrainingsFromPlan = planTrainingRepository.findAllTrainingsFromPlan(plan);
-        allTrainingsFromPlan.forEach(planTraining -> planTrainingListLinkedHashMap
-                .put(planTraining, trainingExerciseRepository.findAllExercisesFromTraining(planTraining.getTraining())));
+        planTrainingRepository.findAllTrainingsFromPlan(plan)
+                .forEach(planTraining -> planTrainingListLinkedHashMap
+                .put(planTraining, trainingExerciseRepository
+                        .findAllExercisesFromTraining(planTraining.getTraining())));
         return planTrainingListLinkedHashMap;
     }
 }

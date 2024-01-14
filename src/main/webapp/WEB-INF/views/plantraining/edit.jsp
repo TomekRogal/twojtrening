@@ -38,7 +38,7 @@
                                 </c:forEach>
                             </form:select>
                             <form:errors cssStyle="color: red" path="week"/><br>
-                            <input class="btn btn-primary" type="submit" value="Dodaj">
+                            <input class="btn btn-primary" type="submit" value="Edytuj">
                         </form:form>
                     </div>
                 </div>

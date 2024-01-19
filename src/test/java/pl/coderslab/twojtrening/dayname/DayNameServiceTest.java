@@ -18,7 +18,7 @@ class DayNameServiceTest {
         underTest = new DayNameService(dayNameRepository);
     }
     @Test
-    void findAllDaysNames() {
+    void shouldFindAllDaysNames() {
         //when
         underTest.findAllDaysNames();
         //then

@@ -23,11 +23,13 @@ public class ExerciseService {
     }
 
     public Exercise getSingleExerciseById(Long id) {
-        return exerciseRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Exercise with id:%s not found", id)));
+        return exerciseRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("Exercise with id:%s not found", id)));
     }
 
     public void deleteExerciseById(Long id) {
-        Exercise exercise = exerciseRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Exercise with id:%s not found", id)));
+        Exercise exercise = exerciseRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("Exercise with id:%s not found", id)));
         exerciseRepository.deleteById(exercise.getId());
     }
 

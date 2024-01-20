@@ -12,7 +12,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -20,7 +19,8 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class ExerciseServiceTest {
 
-    @Mock ExerciseRepository exerciseRepository;
+    @Mock
+    ExerciseRepository exerciseRepository;
     private ExerciseService underTest;
 
     @BeforeEach
@@ -60,11 +60,13 @@ class ExerciseServiceTest {
         exercise.setDescription("test");
         given(exerciseRepository.findById(id)).willReturn(Optional.of(exercise));
         //when
-        underTest.getSingleExerciseById(id);
+        Exercise singleExerciseById = underTest.getSingleExerciseById(id);
         //then
         verify(exerciseRepository).findById(id);
+        assertThat(singleExerciseById).isEqualTo(exercise);
 
     }
+
     @Test
     void shouldNotGetSingleExerciseById() {
         //given
@@ -73,7 +75,7 @@ class ExerciseServiceTest {
         //when
 
         //then
-        assertThatThrownBy(()-> underTest.getSingleExerciseById(id))
+        assertThatThrownBy(() -> underTest.getSingleExerciseById(id))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining(String.format("Exercise with id:%s not found", id));
 
@@ -86,22 +88,23 @@ class ExerciseServiceTest {
         Exercise exercise = new Exercise();
         exercise.setName("test");
         exercise.setDescription("test");
+        exercise.setId(id);
         given(exerciseRepository.findById(id)).willReturn(Optional.of(exercise));
         //when
+        underTest.deleteExerciseById(id);
         //then
-        assertAll(()->underTest.deleteExerciseById(id));
+        verify(exerciseRepository).findById(id);
+        verify(exerciseRepository).deleteById(id);
     }
+
     @Test
     void shouldNotDeleteExerciseById() {
         //given
         long id = 1L;
-        Exercise exercise = new Exercise();
-        exercise.setName("test");
-        exercise.setDescription("test");
         given(exerciseRepository.findById(id)).willReturn(Optional.empty());
         //when
         //then
-        assertThatThrownBy(()-> underTest.deleteExerciseById(id))
+        assertThatThrownBy(() -> underTest.deleteExerciseById(id))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining(String.format("Exercise with id:%s not found", id));
     }

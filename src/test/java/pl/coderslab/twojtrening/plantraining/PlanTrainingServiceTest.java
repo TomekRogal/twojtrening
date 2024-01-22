@@ -3,6 +3,7 @@ package pl.coderslab.twojtrening.plantraining;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -26,16 +27,16 @@ class PlanTrainingServiceTest {
     PlanTrainingRepository planTrainingRepository;
     @InjectMocks
     PlanTrainingService underTest;
+    @Captor
+    ArgumentCaptor<PlanTraining> planTrainingArgumentCaptor;
 
     @Test
     void shouldAddTrainingToPlan() {
         //given
-        PlanTraining planTraining = new PlanTraining();
-        planTraining.setId(1L);
+        PlanTraining planTraining = PlanTraining.builder().id(1L).build();
         //when
         underTest.addTrainingToPlan(planTraining);
         //then
-        ArgumentCaptor<PlanTraining> planTrainingArgumentCaptor = ArgumentCaptor.forClass(PlanTraining.class);
         verify(planTrainingRepository).save(planTrainingArgumentCaptor.capture());
         PlanTraining capturedPlanTraining = planTrainingArgumentCaptor.getValue();
         assertThat(capturedPlanTraining).isEqualTo(planTraining);
@@ -45,14 +46,13 @@ class PlanTrainingServiceTest {
     void shouldDeleteTrainingFromPlan() {
         //given
         long id = 1L;
-        PlanTraining planTraining = new PlanTraining();
-        Plan plan = new Plan();
-        User user = new User();
-        user.setId(id);
-        plan.setId(id);
-        plan.setUser(user);
-        planTraining.setId(id);
-        planTraining.setPlan(plan);
+        User user = User.builder().id(id).build();
+        Plan plan = Plan.builder()
+                .id(id).user(user)
+                .build();
+        PlanTraining planTraining = PlanTraining.builder()
+                .id(id).plan(plan)
+                .build();
         given(planTrainingRepository.findById(id)).willReturn(Optional.of(planTraining));
         //when
         underTest.deleteTrainingFromPlan(id,user);
@@ -64,8 +64,7 @@ class PlanTrainingServiceTest {
     void shouldNotDeleteTrainingFromPlanWrongId() {
         //given
         long id = 1L;
-        User user = new User();
-        user.setId(id);
+        User user = User.builder().id(id).build();
         given(planTrainingRepository.findById(id)).willReturn(Optional.empty());
         //when
         //then
@@ -78,16 +77,14 @@ class PlanTrainingServiceTest {
     void shouldNotDeleteTrainingFromPlanWrongUser() {
         //given
         long id = 1L;
-        PlanTraining planTraining = new PlanTraining();
-        Plan plan = new Plan();
-        User user = new User();
-        User wrongUser = new User();
-        user.setId(id);
-        wrongUser.setId(2L);
-        plan.setId(id);
-        plan.setUser(user);
-        planTraining.setId(id);
-        planTraining.setPlan(plan);
+        User user = User.builder().id(id).build();
+        User wrongUser = User.builder().id(2L).build();
+        Plan plan = Plan.builder()
+                .id(id).user(user)
+                .build();
+        PlanTraining planTraining = PlanTraining.builder()
+                .id(id).plan(plan)
+                .build();
         given(planTrainingRepository.findById(id)).willReturn(Optional.of(planTraining));
         //when
         assertThatThrownBy(() -> underTest.deleteTrainingFromPlan(id, wrongUser))
@@ -100,14 +97,13 @@ class PlanTrainingServiceTest {
     void shouldGetSinglePlanWithTrainingsById() {
         //given
         long id = 1L;
-        PlanTraining planTraining = new PlanTraining();
-        Plan plan = new Plan();
-        User user = new User();
-        user.setId(id);
-        plan.setId(id);
-        plan.setUser(user);
-        planTraining.setId(id);
-        planTraining.setPlan(plan);
+        User user = User.builder().id(id).build();
+        Plan plan = Plan.builder()
+                .id(id).user(user)
+                .build();
+        PlanTraining planTraining = PlanTraining.builder()
+                .id(id).plan(plan)
+                .build();
         given(planTrainingRepository.findById(id)).willReturn(Optional.of(planTraining));
         //when
         PlanTraining singlePlanWithTrainingsById = underTest.getSinglePlanWithTrainingsById(id, user);
@@ -119,8 +115,7 @@ class PlanTrainingServiceTest {
     void shouldGetSinglePlanWithTrainingsByIdWrongId() {
         //given
         long id = 1L;
-        User user = new User();
-        user.setId(id);
+        User user = User.builder().id(id).build();
         given(planTrainingRepository.findById(id)).willReturn(Optional.empty());
         //when
         //then
@@ -132,16 +127,14 @@ class PlanTrainingServiceTest {
     void shouldGetSinglePlanWithTrainingsByIdWrongUser() {
         //given
         long id = 1L;
-        PlanTraining planTraining = new PlanTraining();
-        Plan plan = new Plan();
-        User user = new User();
-        User wrongUser = new User();
-        user.setId(id);
-        wrongUser.setId(2L);
-        plan.setId(id);
-        plan.setUser(user);
-        planTraining.setId(id);
-        planTraining.setPlan(plan);
+        User user = User.builder().id(id).build();
+        User wrongUser = User.builder().id(2L).build();
+        Plan plan = Plan.builder()
+                .id(id).user(user)
+                .build();
+        PlanTraining planTraining = PlanTraining.builder()
+                .id(id).plan(plan)
+                .build();
         given(planTrainingRepository.findById(id)).willReturn(Optional.of(planTraining));
         //when
         //then

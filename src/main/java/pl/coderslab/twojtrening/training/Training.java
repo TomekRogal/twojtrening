@@ -1,6 +1,9 @@
 package pl.coderslab.twojtrening.training;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import pl.coderslab.twojtrening.user.User;
 
 import javax.persistence.*;
@@ -8,7 +11,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class Training {
     @Id

@@ -3,6 +3,7 @@ package pl.coderslab.twojtrening.training;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -28,12 +29,12 @@ class TrainingServiceTest {
     TrainingExerciseRepository trainingExerciseRepository;
     @InjectMocks
     TrainingService underTest;
-
+    @Captor
+    ArgumentCaptor<Training> trainingArgumentCaptor;
     @Test
     void shouldFindAllTrainingsFromUser() {
         //given
-        User user = new User();
-        user.setId(1L);
+        User user = User.builder().id(1L).build();
         //when
         underTest.findAllTrainingsFromUser(user);
         //then
@@ -44,11 +45,10 @@ class TrainingServiceTest {
     void shouldGetSingleTrainingById() {
         //given
         long id = 1L;
-        Training training = new Training();
-        User user = new User();
-        user.setId(id);
-        training.setId(id);
-        training.setUser(user);
+        User user = User.builder().id(id).build();
+        Training training = Training.builder()
+                .id(id).user(user)
+                .build();
         given(trainingRepository.findById(id)).willReturn(Optional.of(training));
         //when
         Training singleTrainingById = underTest.getSingleTrainingById(id, user);
@@ -61,8 +61,7 @@ class TrainingServiceTest {
     void shouldNotGetSingleTrainingByIdWrongId() {
         //given
         long id = 1L;
-        User user = new User();
-        user.setId(id);
+        User user = User.builder().id(id).build();
         given(trainingRepository.findById(id)).willReturn(Optional.empty());
         //when
         //then
@@ -75,13 +74,11 @@ class TrainingServiceTest {
     void shouldNotGetSingleTrainingByIdWrongUser() {
         //given
         long id = 1L;
-        Training training = new Training();
-        User user = new User();
-        User wrongUser = new User();
-        user.setId(id);
-        wrongUser.setId(2L);
-        training.setId(id);
-        training.setUser(user);
+        User user = User.builder().id(id).build();
+        Training training = Training.builder()
+                .id(id).user(user)
+                .build();
+        User wrongUser = User.builder().id(2L).build();
         given(trainingRepository.findById(id)).willReturn(Optional.of(training));
         //when
         //then
@@ -93,12 +90,10 @@ class TrainingServiceTest {
     @Test
     void shouldAddNewTraining() {
         //given
-        Training training = new Training();
-        training.setId(1L);
+        Training training = Training.builder().id(1L).build();
         //when
         underTest.addTraining(training);
         //then
-        ArgumentCaptor<Training> trainingArgumentCaptor = ArgumentCaptor.forClass(Training.class);
         verify(trainingRepository).save(trainingArgumentCaptor.capture());
         Training capturedTraining = trainingArgumentCaptor.getValue();
         assertThat(capturedTraining).isEqualTo(training);
@@ -108,11 +103,10 @@ class TrainingServiceTest {
     void shouldDeleteTrainingById() {
         //given
         long id = 1L;
-        Training training = new Training();
-        User user = new User();
-        user.setId(id);
-        training.setId(id);
-        training.setUser(user);
+        User user = User.builder().id(id).build();
+        Training training = Training.builder()
+                .id(id).user(user)
+                .build();
         given(trainingRepository.findById(id)).willReturn(Optional.of(training));
         //when
         underTest.deleteTrainingById(id, user);
@@ -125,8 +119,7 @@ class TrainingServiceTest {
     void shouldNotDeleteTrainingByIdWrongId() {
         //given
         long id = 1L;
-        User user = new User();
-        user.setId(id);
+        User user = User.builder().id(id).build();
         given(trainingRepository.findById(id)).willReturn(Optional.empty());
         //when
         //then
@@ -140,13 +133,11 @@ class TrainingServiceTest {
     void shouldNotDeleteTrainingByIdWrongUser() {
         //given
         long id = 1L;
-        Training training = new Training();
-        User user = new User();
-        User wrongUser = new User();
-        user.setId(id);
-        wrongUser.setId(2L);
-        training.setId(id);
-        training.setUser(user);
+        User user = User.builder().id(id).build();
+        Training training = Training.builder()
+                .id(id).user(user)
+                .build();
+        User wrongUser = User.builder().id(2L).build();
         given(trainingRepository.findById(id)).willReturn(Optional.of(training));
         //when
         //then
@@ -159,8 +150,7 @@ class TrainingServiceTest {
     @Test
     void findAllExerciseFromTraining() {
         //given
-        Training training = new Training();
-        training.setId(1L);
+        Training training = Training.builder().id(1L).build();
         //when
         underTest.findAllExerciseFromTraining(training);
         //then

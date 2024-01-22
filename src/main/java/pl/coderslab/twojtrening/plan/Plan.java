@@ -1,5 +1,8 @@
 package pl.coderslab.twojtrening.plan;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import pl.coderslab.twojtrening.user.User;
 
@@ -9,6 +12,9 @@ import java.time.LocalDate;
 
 
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Plan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +32,7 @@ public class Plan {
     @ManyToOne
     @NotNull
     private User user;
+
 
     public int getWeeks() {
         return weeks;

@@ -1,5 +1,8 @@
 package pl.coderslab.twojtrening.trainingexercise;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import pl.coderslab.twojtrening.exercise.Exercise;
 import pl.coderslab.twojtrening.training.Training;
 
@@ -7,6 +10,9 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class TrainingExercise {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

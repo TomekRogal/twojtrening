@@ -3,6 +3,7 @@ package pl.coderslab.twojtrening.plan;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,6 +39,8 @@ class PlanServiceTest {
     TrainingExerciseRepository trainingExerciseRepository;
     @InjectMocks
     PlanService underTest;
+    @Captor
+    ArgumentCaptor<Plan> planArgumentCaptor;
 
     @Test
     void shouldFindAllPlansFromUser() {
@@ -112,7 +115,6 @@ class PlanServiceTest {
         //when
         underTest.addPlan(plan);
         //then
-        ArgumentCaptor<Plan> planArgumentCaptor = ArgumentCaptor.forClass(Plan.class);
         verify(planRepository).save(planArgumentCaptor.capture());
         Plan capturedPlan = planArgumentCaptor.getValue();
         assertThat(capturedPlan).isEqualTo(plan);

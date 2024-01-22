@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.coderslab.twojtrening.error.NotFoundException;
@@ -23,12 +25,12 @@ class ExerciseServiceTest {
 
     @Mock
     ExerciseRepository exerciseRepository;
+    @InjectMocks
     private ExerciseService underTest;
+    @Captor
+    ArgumentCaptor<Exercise> exerciseArgumentCaptor;
 
-    @BeforeEach
-    void setUp() {
-        underTest = new ExerciseService(exerciseRepository);
-    }
+
 
     @Test
     void shouldFindAllExercises() {
@@ -47,7 +49,6 @@ class ExerciseServiceTest {
         //when
         underTest.addExercise(exercise);
         //then
-        ArgumentCaptor<Exercise> exerciseArgumentCaptor = ArgumentCaptor.forClass(Exercise.class);
         verify(exerciseRepository).save(exerciseArgumentCaptor.capture());
         Exercise capturedExercise = exerciseArgumentCaptor.getValue();
         assertThat(capturedExercise).isEqualTo(exercise);

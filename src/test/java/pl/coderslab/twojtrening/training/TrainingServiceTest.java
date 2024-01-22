@@ -3,6 +3,7 @@ package pl.coderslab.twojtrening.training;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -28,7 +29,8 @@ class TrainingServiceTest {
     TrainingExerciseRepository trainingExerciseRepository;
     @InjectMocks
     TrainingService underTest;
-
+    @Captor
+    ArgumentCaptor<Training> trainingArgumentCaptor;
     @Test
     void shouldFindAllTrainingsFromUser() {
         //given
@@ -98,7 +100,6 @@ class TrainingServiceTest {
         //when
         underTest.addTraining(training);
         //then
-        ArgumentCaptor<Training> trainingArgumentCaptor = ArgumentCaptor.forClass(Training.class);
         verify(trainingRepository).save(trainingArgumentCaptor.capture());
         Training capturedTraining = trainingArgumentCaptor.getValue();
         assertThat(capturedTraining).isEqualTo(training);

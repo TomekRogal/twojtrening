@@ -15,7 +15,9 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -131,6 +133,8 @@ class TrainingServiceTest {
         assertThatThrownBy(() -> underTest.deleteTrainingById(id, user))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining(String.format("Training with id:%s not found", id));
+        verify(trainingExerciseRepository,never()).deleteAllFromTraining(any());
+        verify(trainingRepository,never()).deleteById(any());
     }
     @Test
     void shouldNotDeleteTrainingByIdWrongUser() {
@@ -149,6 +153,8 @@ class TrainingServiceTest {
         assertThatThrownBy(() -> underTest.deleteTrainingById(id, wrongUser))
                 .isInstanceOf(AccessUserException.class)
                 .hasMessageContaining("Access forbidden");
+        verify(trainingExerciseRepository,never()).deleteAllFromTraining(any());
+        verify(trainingRepository,never()).deleteById(any());
     }
     @Test
     void findAllExerciseFromTraining() {

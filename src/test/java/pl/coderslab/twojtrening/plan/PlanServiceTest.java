@@ -22,7 +22,9 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 
@@ -62,6 +64,7 @@ class PlanServiceTest {
         underTest.deletePlanById(id, user);
         //then
         verify(planRepository).findById(id);
+        verify(planTrainingRepository).deleteAllFromPlan(plan);
         verify(planRepository).deleteById(id);
     }
     @Test
@@ -76,6 +79,8 @@ class PlanServiceTest {
         assertThatThrownBy(() -> underTest.deletePlanById(id, user))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining(String.format("Plan with id:%s not found", id));
+        verify(planRepository,never()).deleteById(any());
+        verify(planTrainingRepository,never()).deleteAllFromPlan(any());
     }
     @Test
     void shouldNotDeletePlanByIdWrongUser() {
@@ -94,6 +99,8 @@ class PlanServiceTest {
         assertThatThrownBy(() -> underTest.deletePlanById(id, wrongUser))
                 .isInstanceOf(AccessUserException.class)
                 .hasMessageContaining("Access forbidden");
+        verify(planRepository,never()).deleteById(any());
+        verify(planTrainingRepository,never()).deleteAllFromPlan(any());
     }
 
 
@@ -207,6 +214,8 @@ class PlanServiceTest {
         assertThatThrownBy(() -> underTest.getSinglePlanWithTrainingsAndExercisesById(id, user))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining(String.format("Plan with id:%s not found", id));
+        verify(planTrainingRepository,never()).findAllTrainingsFromPlan(any());
+        verify(trainingExerciseRepository,never()).findAllExercisesFromTraining(any());
     }
     @Test
     void shouldNotGetSinglePlanWithTrainingsAndExercisesByIdWrongUser() {
@@ -224,6 +233,8 @@ class PlanServiceTest {
         assertThatThrownBy(() -> underTest.getSinglePlanWithTrainingsAndExercisesById(id, wrongUser))
                 .isInstanceOf(AccessUserException.class)
                 .hasMessageContaining("Access forbidden");
+        verify(planTrainingRepository,never()).findAllTrainingsFromPlan(any());
+        verify(trainingExerciseRepository,never()).findAllExercisesFromTraining(any());
 
     }
 }

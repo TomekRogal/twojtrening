@@ -1,4 +1,4 @@
-package pl.coderslab.twojtrening;
+package pl.coderslab.twojtrening.home;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;

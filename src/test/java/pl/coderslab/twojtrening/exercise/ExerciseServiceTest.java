@@ -12,7 +12,9 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 
@@ -107,5 +109,6 @@ class ExerciseServiceTest {
         assertThatThrownBy(() -> underTest.deleteExerciseById(id))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining(String.format("Exercise with id:%s not found", id));
+        verify(exerciseRepository, never()).deleteById(any());
     }
 }

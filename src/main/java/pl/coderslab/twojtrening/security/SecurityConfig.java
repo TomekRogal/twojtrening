@@ -1,4 +1,4 @@
-package pl.coderslab.twojtrening;
+package pl.coderslab.twojtrening.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

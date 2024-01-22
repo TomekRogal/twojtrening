@@ -45,8 +45,7 @@ class PlanServiceTest {
     @Test
     void shouldFindAllPlansFromUser() {
         //given
-        User user = new User();
-        user.setId(1L);
+        User user = User.builder().id(1L).build();
         //when
         underTest.findAllPlansFromUser(user);
         // then
@@ -57,11 +56,10 @@ class PlanServiceTest {
     void shouldDeletePlanById() {
         //given
         long id = 1L;
-        Plan plan = new Plan();
-        User user = new User();
-        user.setId(id);
-        plan.setId(id);
-        plan.setUser(user);
+        User user = User.builder().id(id).build();
+        Plan plan = Plan.builder()
+                .id(id).user(user)
+                .build();
         given(planRepository.findById(id)).willReturn(Optional.of(plan));
         //when
         underTest.deletePlanById(id, user);
@@ -74,8 +72,7 @@ class PlanServiceTest {
     void shouldNotDeletePlanByIdWrongId() {
         //given
         long id = 1L;
-        User user = new User();
-        user.setId(id);
+        User user = User.builder().id(id).build();
         given(planRepository.findById(id)).willReturn(Optional.empty());
         //when
         //then
@@ -89,13 +86,11 @@ class PlanServiceTest {
     void shouldNotDeletePlanByIdWrongUser() {
         //given
         long id = 1L;
-        Plan plan = new Plan();
-        User user = new User();
-        User wrongUser = new User();
-        user.setId(id);
-        wrongUser.setId(2L);
-        plan.setId(id);
-        plan.setUser(user);
+        User user = User.builder().id(id).build();
+        User wrongUser = User.builder().id(2L).build();
+        Plan plan = Plan.builder()
+                .id(id).user(user)
+                .build();
         given(planRepository.findById(id)).willReturn(Optional.of(plan));
         //when
         //then
@@ -110,8 +105,7 @@ class PlanServiceTest {
     @Test
     void shouldAddNewPlan() {
         //given
-        Plan plan = new Plan();
-        plan.setId(1L);
+        Plan plan = Plan.builder().id(1L).build();
         //when
         underTest.addPlan(plan);
         //then
@@ -124,11 +118,10 @@ class PlanServiceTest {
     void shouldGetSinglePlanById() {
         //given
         long id = 1L;
-        Plan plan = new Plan();
-        User user = new User();
-        user.setId(id);
-        plan.setId(id);
-        plan.setUser(user);
+        User user = User.builder().id(id).build();
+        Plan plan = Plan.builder()
+                .id(id).user(user)
+                .build();
         given(planRepository.findById(id)).willReturn(Optional.of(plan));
         //when
         Plan singlePlanById = underTest.getSinglePlanById(id, user);
@@ -141,8 +134,7 @@ class PlanServiceTest {
     void shouldNotGetSinglePlanByIdWrongId() {
         //given
         long id = 1L;
-        User user = new User();
-        user.setId(id);
+        User user = User.builder().id(id).build();
         given(planRepository.findById(id)).willReturn(Optional.empty());
         //when
         //then
@@ -156,13 +148,11 @@ class PlanServiceTest {
     void shouldNotGetSinglePlanByIdWrongUser() {
         //given
         long id = 1L;
-        Plan plan = new Plan();
-        User user = new User();
-        User wrongUser = new User();
-        user.setId(id);
-        wrongUser.setId(2L);
-        plan.setId(id);
-        plan.setUser(user);
+        User user = User.builder().id(id).build();
+        User wrongUser = User.builder().id(2L).build();
+        Plan plan = Plan.builder()
+                .id(id).user(user)
+                .build();
         given(planRepository.findById(id)).willReturn(Optional.of(plan));
         //when
         //then
@@ -175,23 +165,18 @@ class PlanServiceTest {
     @Test
     void shouldGetSinglePlanWithTrainingsAndExercisesById() {
         long id = 1L;
-        Plan plan = new Plan();
-        User user = new User();
-        Training training = new Training();
-        Exercise exercise = new Exercise();
-        PlanTraining planTraining = new PlanTraining();
-        TrainingExercise trainingExercise = new TrainingExercise();
-        user.setId(id);
-        plan.setId(id);
-        plan.setUser(user);
-        training.setId(id);
-        exercise.setId(id);
-        planTraining.setId(id);
-        planTraining.setPlan(plan);
-        planTraining.setTraining(training);
-        trainingExercise.setId(id);
-        trainingExercise.setTraining(training);
-        trainingExercise.setExercise(exercise);
+        User user = User.builder().id(id).build();
+        Plan plan = Plan.builder()
+                .id(id).user(user)
+                .build();
+        Training training = Training.builder().id(id).build();
+        Exercise exercise = Exercise.builder().id(id).build();
+        PlanTraining planTraining = PlanTraining.builder()
+                .id(id).plan(plan).training(training)
+                .build();
+        TrainingExercise trainingExercise = TrainingExercise.builder()
+                .id(id).training(training).exercise(exercise)
+                .build();
         Map<PlanTraining, List<TrainingExercise>> expectedResult = Map.of(planTraining,List.of(trainingExercise));
         given(planRepository.findById(id)).willReturn(Optional.of(plan));
         given(planTrainingRepository.findAllTrainingsFromPlan(plan)).willReturn(List.of(planTraining));
@@ -208,8 +193,7 @@ class PlanServiceTest {
     void shouldNotGetSinglePlanWithTrainingsAndExercisesByIdWrongId() {
         //given
         long id = 1L;
-        User user = new User();
-        user.setId(id);
+        User user = User.builder().id(id).build();
         given(planRepository.findById(id)).willReturn(Optional.empty());
         //when
         //then
@@ -222,13 +206,11 @@ class PlanServiceTest {
     @Test
     void shouldNotGetSinglePlanWithTrainingsAndExercisesByIdWrongUser() {
         long id = 1L;
-        Plan plan = new Plan();
-        User user = new User();
-        User wrongUser = new User();
-        user.setId(id);
-        wrongUser.setId(2L);
-        plan.setId(id);
-        plan.setUser(user);
+        User user = User.builder().id(id).build();
+        User wrongUser = User.builder().id(2L).build();
+        Plan plan = Plan.builder()
+                .id(id).user(user)
+                .build();
         given(planRepository.findById(id)).willReturn(Optional.of(plan));
         //when
         //then

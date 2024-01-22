@@ -44,8 +44,6 @@ class ExerciseServiceTest {
     void shouldAddNewExercise() {
         //given
         Exercise exercise = new Exercise();
-        exercise.setName("test");
-        exercise.setDescription("test");
         //when
         underTest.addExercise(exercise);
         //then
@@ -58,9 +56,7 @@ class ExerciseServiceTest {
     void shouldGetSingleExerciseById() {
         //given
         long id = 1L;
-        Exercise exercise = new Exercise();
-        exercise.setName("test");
-        exercise.setDescription("test");
+        Exercise exercise = Exercise.builder().id(id).build();
         given(exerciseRepository.findById(id)).willReturn(Optional.of(exercise));
         //when
         Exercise singleExerciseById = underTest.getSingleExerciseById(id);
@@ -88,10 +84,7 @@ class ExerciseServiceTest {
     void shouldDeleteExerciseById() {
         //given
         long id = 1L;
-        Exercise exercise = new Exercise();
-        exercise.setName("test");
-        exercise.setDescription("test");
-        exercise.setId(id);
+        Exercise exercise = Exercise.builder().id(id).build();
         given(exerciseRepository.findById(id)).willReturn(Optional.of(exercise));
         //when
         underTest.deleteExerciseById(id);

@@ -25,16 +25,16 @@ public class TrainingService {
     }
     public Training getSingleTrainingById(Long id, User user) {
         Training training = trainingRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(String.format("Plan with id:%s not found", id)));
+                .orElseThrow(() -> new NotFoundException(String.format("Training with id:%s not found", id)));
         if(!training.getUser().getId().equals(user.getId())){
-            throw new AccessUserException("Brak dostępu");
+            throw new AccessUserException("Access forbidden");
         }
         return training;
     }
     public void addTraining(Training training){trainingRepository.save(training);}
     public void deleteTrainingById(Long id, User user) {
         Training training = trainingRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(String.format("Plan with id:%s not found", id)));
+                .orElseThrow(() -> new NotFoundException(String.format("Training with id:%s not found", id)));
         if(!training.getUser().getId().equals(user.getId())){
             throw new AccessUserException("Access forbidden");
         }

@@ -6,7 +6,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.parameters.P;
 import pl.coderslab.twojtrening.error.AccessUserException;
 import pl.coderslab.twojtrening.error.NotFoundException;
 import pl.coderslab.twojtrening.exercise.Exercise;

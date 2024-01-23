@@ -38,15 +38,12 @@ class PlanControllerTest {
     @Test
     @WithUserDetails("test")
     void findAll() throws Exception {
-        //given
         mockMvc.perform(get("/plan/all"))
                 .andDo(print())
                 .andExpect(status().is(200))
                 .andExpect(view().name("plan/all"))
                 .andExpect(model().attribute("plans", hasSize(0)))
                 .andReturn();
-        //then
-
     }
 
     @Test

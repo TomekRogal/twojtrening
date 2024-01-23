@@ -6,6 +6,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -24,7 +25,8 @@ class ExerciseControllerTest {
     private MockMvc mockMvc;
     @Autowired
     private ExerciseRepository exerciseRepository;
-
+    @Autowired
+    private ExerciseService exerciseService;
 
     @Test
     void shouldFindAllExercises() throws Exception {
@@ -44,8 +46,8 @@ class ExerciseControllerTest {
                 .andExpect(status().is(302))
                 .andExpect(redirectedUrl("/exercise/all"))
                 .andReturn();
-        assertThat(exerciseRepository.findAll().size()).isEqualTo(1);
-        exerciseRepository.save(Exercise.builder().id(3L).name("Ćwiczenie 1").description("Ćwiczenie 1").build());
+        assertThat(exerciseService.findAllExercises().size()).isEqualTo(1);
+        exerciseService.addExercise(Exercise.builder().name("Ćwiczenie 1").description("Ćwiczenie 1").build());
     }
 
     @Test
@@ -55,12 +57,12 @@ class ExerciseControllerTest {
                 .andDo(print())
                 .andExpect(status().is(404))
                 .andReturn();
-        assertThat(exerciseRepository.findAll().size()).isEqualTo(2);
+        assertThat(exerciseService.findAllExercises().size()).isEqualTo(2);
     }
 
     @Test
     @WithUserDetails("test")
-    void shouldAddExerciseForm() throws Exception {
+    void shouldShowAddExerciseForm() throws Exception {
         mockMvc.perform(get("/exercises/add"))
                 .andDo(print())
                 .andExpect(status().is(200))
@@ -71,50 +73,123 @@ class ExerciseControllerTest {
 
     @Test
     @WithUserDetails("test")
-    void shouldAddExerciseFormPost() throws Exception {
+    void shouldAddExerciseFormProcess() throws Exception {
         Exercise exercise = new Exercise();
-        mockMvc.perform(post("/exercises/add")
-                        .flashAttr("exercise", exercise)
-                        .param("id", "")
-                        .param("name", "test")
-                        .param("description", "test")
-                        .with(csrf())
-                )
+        MockHttpServletRequestBuilder request = post("/exercises/add")
+                .flashAttr("exercise", exercise)
+                .param("id", "")
+                .param("name", "test")
+                .param("description", "test")
+                .with(csrf());
+        mockMvc.perform(request)
                 .andDo(print())
                 .andExpect(status().is(302))
                 .andExpect(redirectedUrl("/exercise/all"))
                 .andReturn();
-        assertThat(exerciseRepository.findAll().size()).isEqualTo(3);
+        assertThat(exerciseService.findAllExercises().size()).isEqualTo(3);
         exerciseRepository.delete(exercise);
     }
 
     @Test
     @WithUserDetails("test")
-    void shouldNotAddExerciseFormPost() throws Exception {
+    void shouldNotAddExerciseFormProcess() throws Exception {
         Exercise exercise = new Exercise();
-        mockMvc.perform(post("/exercises/add")
-                        .flashAttr("exercise", exercise)
-                        .param("id", "")
-                        .param("name", "")
-                        .param("description", "test")
-                        .with(csrf())
-                )
+        MockHttpServletRequestBuilder request = post("/exercises/add")
+                .flashAttr("exercise", exercise)
+                .param("id", "")
+                .param("name", "")
+                .param("description", "test")
+                .with(csrf());
+        mockMvc.perform(request)
                 .andDo(print())
                 .andExpect(status().is(200))
                 .andExpect(view().name("exercise/add"))
                 .andReturn();
-        assertThat(exerciseRepository.findAll().size()).isEqualTo(2);
+        assertThat(exerciseService.findAllExercises().size()).isEqualTo(2);
     }
 
     @Test
-    void edit() {
+    @WithUserDetails("test")
+    void shouldShowEditExerciseForm() throws Exception {
+        mockMvc.perform(get("/exercises/edit/4"))
+                .andDo(print())
+                .andExpect(status().is(200))
+                .andExpect(view().name("exercise/edit"))
+                .andExpect(model().attribute("exercise", notNullValue()))
+                .andReturn();
+        assertThat(exerciseService.findAllExercises().size()).isEqualTo(2);
+    }
+    @Test
+    @WithUserDetails("test")
+    void shouldNotShowEditExerciseFormWrongId() throws Exception {
+        mockMvc.perform(get("/exercises/edit/10"))
+                .andDo(print())
+                .andExpect(status().is(404))
+                .andReturn();
+        assertThat(exerciseService.findAllExercises().size()).isEqualTo(2);
     }
 
     @Test
-    void editProcess() {
+    @WithUserDetails("test")
+    void shouldEditExerciseFormProcess() throws Exception {
+        Exercise exercise = exerciseService.getSingleExerciseById(4L);
+        exercise.setName("testEdit");
+        exercise.setDescription("testEdit");
+        MockHttpServletRequestBuilder requst = post("/exercises/edit/4")
+                .flashAttr("exercise", exercise)
+                .param("id", exercise.getId().toString())
+                .param("name", exercise.getName())
+                .param("description", exercise.getDescription())
+                .with(csrf());
+        mockMvc.perform(requst)
+                .andDo(print())
+                .andExpect(status().is(302))
+                .andExpect(redirectedUrl("/exercise/all"))
+                .andReturn();
+        Exercise editedExercise = exerciseService.getSingleExerciseById(4L);
+        assertThat(editedExercise.getName()).isEqualTo(exercise.getName());
+        assertThat(editedExercise.getDescription()).isEqualTo(exercise.getDescription());
+        assertThat(exerciseService.findAllExercises().size()).isEqualTo(2);
     }
 
     @Test
-    void show() {
+    @WithUserDetails("test")
+    void shouldNotEditExerciseFormProcess() throws Exception {
+        Exercise exercise = exerciseService.getSingleExerciseById(4L);
+        exercise.setName("");
+        exercise.setDescription("testEdit");
+        MockHttpServletRequestBuilder request = post("/exercises/edit/4")
+                .flashAttr("exercise", exercise)
+                .param("id", exercise.getId().toString())
+                .param("name", exercise.getName())
+                .param("description", exercise.getDescription())
+                .with(csrf());
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().is(200))
+                .andExpect(view().name("exercise/edit"))
+                .andReturn();
+        assertThat(exerciseService.findAllExercises().size()).isEqualTo(2);
+    }
+    @Test
+    @WithUserDetails("test")
+    void shouldShowSingleExercise() throws Exception {
+        mockMvc.perform(get("/exercise/show/4"))
+                .andDo(print())
+                .andExpect(status().is(200))
+                .andExpect(view().name("exercise/show"))
+                .andExpect(model().attribute("exercise", notNullValue()))
+                .andReturn();
+        assertThat(exerciseService.findAllExercises().size()).isEqualTo(2);
+    }
+    @Test
+    @WithUserDetails("test")
+    void shouldNotShowSingleExerciseWrongId() throws Exception {
+        mockMvc.perform(get("/exercise/show/10"))
+                .andDo(print())
+                .andDo(print())
+                .andExpect(status().is(404))
+                .andReturn();
+        assertThat(exerciseService.findAllExercises().size()).isEqualTo(2);
     }
 }

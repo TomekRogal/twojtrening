@@ -28,7 +28,7 @@ public class ExerciseController {
     @RequestMapping("/exercises/delete/{id}")
     public String delete(@PathVariable Long id) {
         exerciseService.deleteExerciseById(id);
-        return "forward:/exercise/all";
+        return "redirect:/exercise/all";
     }
 
     @GetMapping("/exercises/add")

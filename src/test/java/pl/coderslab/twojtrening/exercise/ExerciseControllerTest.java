@@ -135,13 +135,13 @@ class ExerciseControllerTest {
         Exercise exercise = exerciseService.getSingleExerciseById(4L);
         exercise.setName("testEdit");
         exercise.setDescription("testEdit");
-        MockHttpServletRequestBuilder requst = post("/exercises/edit/4")
+        MockHttpServletRequestBuilder request = post("/exercises/edit/4")
                 .flashAttr("exercise", exercise)
                 .param("id", exercise.getId().toString())
                 .param("name", exercise.getName())
                 .param("description", exercise.getDescription())
                 .with(csrf());
-        mockMvc.perform(requst)
+        mockMvc.perform(request)
                 .andDo(print())
                 .andExpect(status().is(302))
                 .andExpect(redirectedUrl("/exercise/all"))
@@ -186,7 +186,6 @@ class ExerciseControllerTest {
     @WithUserDetails("test")
     void shouldNotShowSingleExerciseWrongId() throws Exception {
         mockMvc.perform(get("/exercise/show/10"))
-                .andDo(print())
                 .andDo(print())
                 .andExpect(status().is(404))
                 .andReturn();

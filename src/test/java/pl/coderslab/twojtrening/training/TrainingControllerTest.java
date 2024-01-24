@@ -1,4 +1,4 @@
-package pl.coderslab.twojtrening.plan;
+package pl.coderslab.twojtrening.training;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import pl.coderslab.twojtrening.plan.Plan;
 import pl.coderslab.twojtrening.user.User;
 import pl.coderslab.twojtrening.user.UserService;
 
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -23,24 +25,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class PlanControllerTest {
+class TrainingControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    private PlanService planService;
+    private TrainingService trainingService;
+    @Autowired
+    private TrainingRepository trainingRepository;
     @Autowired
     private UserService userService;
-    @Autowired
-    private PlanRepository planRepository;
-
     @Test
     @WithUserDetails("test")
-    void shouldFindAllPlansFromUser() throws Exception {
-        mockMvc.perform(get("/plan/all"))
+    void shouldFindAllTrainingsFromUser() throws Exception {
+        mockMvc.perform(get("/training/all"))
                 .andDo(print())
                 .andExpect(status().is(200))
-                .andExpect(view().name("plan/all"))
-                .andExpect(model().attribute("plans", hasSize(2)))
+                .andExpect(view().name("training/all"))
+                .andExpect(model().attribute("trainings", hasSize(2)))
                 .andReturn();
     }
 
@@ -48,34 +49,33 @@ class PlanControllerTest {
     @WithUserDetails("test")
     void shouldDeletePlan() throws Exception {
         User user = userService.findByUserName("test");
-        mockMvc.perform(get("/plan/delete/3"))
+        mockMvc.perform(get("/training/delete/3"))
                 .andDo(print())
                 .andExpect(status().is(302))
-                .andExpect(redirectedUrl("/plan/all"))
+                .andExpect(redirectedUrl("/training/all"))
                 .andReturn();
-        assertThat(planService.findAllPlansFromUser(user).size()).isEqualTo(1);
-        planService.addPlan(Plan.builder().name("Plan 1").startDate(LocalDate.now()).weeks(4).user(user).build());
+        assertThat(trainingService.findAllTrainingsFromUser(user).size()).isEqualTo(1);
+        trainingService.addTraining(Training.builder().name("Training 1").description("Training 1").user(user).build());
     }
     @Test
     @WithUserDetails("test")
     void shouldNotDeletePlan() throws Exception {
         User user = userService.findByUserName("test");
-        mockMvc.perform(get("/plan/delete/10"))
+        mockMvc.perform(get("/training/delete/10"))
                 .andDo(print())
                 .andExpect(status().is(404))
                 .andReturn();
-        assertThat(planService.findAllPlansFromUser(user).size()).isEqualTo(2);
+        assertThat(trainingService.findAllTrainingsFromUser(user).size()).isEqualTo(2);
     }
-
 
     @Test
     @WithUserDetails("test")
     void shouldShowAddPlanForm() throws Exception {
-        mockMvc.perform(get("/plan/add"))
+        mockMvc.perform(get("/training/add"))
                 .andDo(print())
                 .andExpect(status().is(200))
-                .andExpect(view().name("plan/add"))
-                .andExpect(model().attribute("plan", notNullValue()))
+                .andExpect(view().name("training/add"))
+                .andExpect(model().attribute("training", notNullValue()))
                 .andReturn();
     }
 
@@ -83,22 +83,21 @@ class PlanControllerTest {
     @WithUserDetails("test")
     void shouldAddPlanFormProcess() throws Exception {
         User user = userService.findByUserName("test");
-        Plan plan = new Plan();
-        plan.setUser(user);
-        MockHttpServletRequestBuilder request =  post("/plan/add")
-                .flashAttr("plan", plan)
+        Training training = new Training();
+        training.setUser(user);
+        MockHttpServletRequestBuilder request =  post("/training/add")
+                .flashAttr("training", training)
                 .param("id", "")
                 .param("name", "test")
-                .param("startDate", "2024-01-09")
-                .param("weeks","4")
+                .param("description", "test")
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())
                 .andExpect(status().is(302))
-                .andExpect(redirectedUrl("/plan/all"))
+                .andExpect(redirectedUrl("/training/all"))
                 .andReturn();
-        assertThat(planService.findAllPlansFromUser(user).size()).isEqualTo(3);
-        planRepository.delete(plan);
+        assertThat(trainingService.findAllTrainingsFromUser(user).size()).isEqualTo(3);
+        trainingRepository.delete(training);
     }
 
 
@@ -106,113 +105,111 @@ class PlanControllerTest {
     @WithUserDetails("test")
     void shouldNotAddPlanFormProcess() throws Exception {
         User user = userService.findByUserName("test");
-        Plan plan = new Plan();
-        plan.setUser(user);
-        MockHttpServletRequestBuilder request =  post("/plan/add")
-                .flashAttr("plan", plan)
+        Training training = new Training();
+        training.setUser(user);
+        MockHttpServletRequestBuilder request =  post("/training/add")
+                .flashAttr("training", training)
                 .param("id", "")
                 .param("name", "")
-                .param("startDate", "2024-01-09")
-                .param("weeks","4")
+                .param("description", "test")
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())
                 .andExpect(status().is(200))
-                .andExpect(view().name("plan/add"))
+                .andExpect(view().name("training/add"))
                 .andReturn();
-        assertThat(planService.findAllPlansFromUser(user).size()).isEqualTo(2);
+        assertThat(trainingService.findAllTrainingsFromUser(user).size()).isEqualTo(2);
     }
 
     @Test
     @WithUserDetails("test")
     void shouldShowEditPlanForm() throws Exception {
         User user = userService.findByUserName("test");
-        mockMvc.perform(get("/plan/edit/4"))
+        mockMvc.perform(get("/training/edit/4"))
                 .andDo(print())
                 .andExpect(status().is(200))
-                .andExpect(view().name("plan/edit"))
-                .andExpect(model().attribute("plan", notNullValue()))
+                .andExpect(view().name("training/edit"))
+                .andExpect(model().attribute("training", notNullValue()))
                 .andReturn();
-        assertThat(planService.findAllPlansFromUser(user).size()).isEqualTo(2);
+        assertThat(trainingService.findAllTrainingsFromUser(user).size()).isEqualTo(2);
     }
     @Test
     @WithUserDetails("test")
     void shouldNotShowEditPlanFormWrongId() throws Exception {
         User user = userService.findByUserName("test");
-        mockMvc.perform(get("/plan/edit/10"))
+        mockMvc.perform(get("/training/edit/10"))
                 .andDo(print())
                 .andExpect(status().is(404))
                 .andReturn();
-        assertThat(planService.findAllPlansFromUser(user).size()).isEqualTo(2);
+        assertThat(trainingService.findAllTrainingsFromUser(user).size()).isEqualTo(2);
     }
+
+
 
     @Test
     @WithUserDetails("test")
     void shouldEditPlanFormProcess() throws Exception {
         User user = userService.findByUserName("test");
-        Plan plan = planService.getSinglePlanById(4L,user);
-        plan.setName("testName");
-        plan.setWeeks(10);
-        MockHttpServletRequestBuilder request =  post("/plan/edit/4")
-                .flashAttr("plan", plan)
-                .param("id", plan.getId().toString())
-                .param("name", plan.getName())
-                .param("startDate", plan.getStartDate().toString())
-                .param("weeks",String.valueOf(plan.getWeeks()))
+        Training training = trainingService.getSingleTrainingById(4L, user);
+        training.setName("testName");
+        training.setDescription("testDescription");
+        MockHttpServletRequestBuilder request =  post("/training/edit/4")
+                .flashAttr("training", training)
+                .param("id", training.getId().toString())
+                .param("name", training.getName())
+                .param("description", training.getDescription())
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())
                 .andExpect(status().is(302))
-                .andExpect(redirectedUrl("/plan/all"))
+                .andExpect(redirectedUrl("/training/all"))
                 .andReturn();
-        Plan editedPlan = planService.getSinglePlanById(4L,user);
-        assertThat(editedPlan.getName()).isEqualTo(plan.getName());
-        assertThat(editedPlan.getWeeks()).isEqualTo(plan.getWeeks());
-        assertThat(planService.findAllPlansFromUser(user).size()).isEqualTo(2);
+        Training editedTraining = trainingService.getSingleTrainingById(4L, user);
+        assertThat(editedTraining.getName()).isEqualTo(training.getName());
+        assertThat(editedTraining.getDescription()).isEqualTo(training.getDescription());
+        assertThat(trainingService.findAllTrainingsFromUser(user).size()).isEqualTo(2);
     }
     @Test
     @WithUserDetails("test")
     void shouldNotEditPlanFormProcess() throws Exception {
         User user = userService.findByUserName("test");
-        Plan plan = planService.getSinglePlanById(4L,user);
-        plan.setName("");
-        plan.setWeeks(10);
-        MockHttpServletRequestBuilder request =  post("/plan/edit/4")
-                .flashAttr("plan", plan)
-                .param("id", plan.getId().toString())
-                .param("name", plan.getName())
-                .param("startDate", plan.getStartDate().toString())
-                .param("weeks",String.valueOf(plan.getWeeks()))
+        Training training = trainingService.getSingleTrainingById(4L, user);
+        training.setName("");
+        MockHttpServletRequestBuilder request =  post("/training/edit/4")
+                .flashAttr("training", training)
+                .param("id", training.getId().toString())
+                .param("name", training.getName())
+                .param("description", training.getDescription())
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())
                 .andExpect(status().is(200))
-                .andExpect(view().name("plan/edit"))
+                .andExpect(view().name("training/edit"))
                 .andReturn();
-        assertThat(planService.findAllPlansFromUser(user).size()).isEqualTo(2);
+        assertThat(trainingService.findAllTrainingsFromUser(user).size()).isEqualTo(2);
     }
     @Test
     @WithUserDetails("test")
     void shouldShowSinglePlan() throws Exception {
         User user = userService.findByUserName("test");
-        mockMvc.perform(get("/plan/show/4"))
+        mockMvc.perform(get("/training/show/4"))
                 .andDo(print())
                 .andExpect(status().is(200))
-                .andExpect(view().name("plan/show"))
-                .andExpect(model().attribute("plan", notNullValue()))
+                .andExpect(view().name("training/show"))
+                .andExpect(model().attribute("training", notNullValue()))
                 // @Todo
-                .andExpect(model().attribute("trainingsList", notNullValue()))
+                .andExpect(model().attribute("exercises", notNullValue()))
                 .andReturn();
-        assertThat(planService.findAllPlansFromUser(user).size()).isEqualTo(2);
+        assertThat(trainingService.findAllTrainingsFromUser(user).size()).isEqualTo(2);
     }
     @Test
     @WithUserDetails("test")
     void shouldNotShowSinglePlan() throws Exception {
         User user = userService.findByUserName("test");
-        mockMvc.perform(get("/plan/show/10"))
+        mockMvc.perform(get("/training/show/10"))
                 .andDo(print())
                 .andExpect(status().is(404))
                 .andReturn();
-        assertThat(planService.findAllPlansFromUser(user).size()).isEqualTo(2);
+        assertThat(trainingService.findAllTrainingsFromUser(user).size()).isEqualTo(2);
     }
 }

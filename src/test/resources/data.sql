@@ -11,3 +11,6 @@ INSERT INTO "user_role"  VALUES (1,2);
 
 INSERT INTO "plan" ("id" , "name" ,"start_date", "weeks", "user_id") VALUES (3,'Plan 1','2024-01-09', 4, 1);
 INSERT INTO "plan" ("id" , "name" ,"start_date", "weeks", "user_id") VALUES (4,'Plan 2', '2024-01-09', 4, 1);
+
+INSERT INTO "training" VALUES (3,'Training 1','Training 1', 1);
+INSERT INTO "training" VALUES (4,'Training 2','Training 2', 1);

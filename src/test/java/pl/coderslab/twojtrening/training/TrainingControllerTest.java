@@ -7,16 +7,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import pl.coderslab.twojtrening.plan.Plan;
 import pl.coderslab.twojtrening.user.User;
 import pl.coderslab.twojtrening.user.UserService;
-
-import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -34,6 +30,7 @@ class TrainingControllerTest {
     private TrainingRepository trainingRepository;
     @Autowired
     private UserService userService;
+
     @Test
     @WithUserDetails("test")
     void shouldFindAllTrainingsFromUser() throws Exception {
@@ -57,6 +54,7 @@ class TrainingControllerTest {
         assertThat(trainingService.findAllTrainingsFromUser(user).size()).isEqualTo(1);
         trainingService.addTraining(Training.builder().name("Training 1").description("Training 1").user(user).build());
     }
+
     @Test
     @WithUserDetails("test")
     void shouldNotDeletePlan() throws Exception {
@@ -85,7 +83,7 @@ class TrainingControllerTest {
         User user = userService.findByUserName("test");
         Training training = new Training();
         training.setUser(user);
-        MockHttpServletRequestBuilder request =  post("/training/add")
+        MockHttpServletRequestBuilder request = post("/training/add")
                 .flashAttr("training", training)
                 .param("id", "")
                 .param("name", "test")
@@ -107,7 +105,7 @@ class TrainingControllerTest {
         User user = userService.findByUserName("test");
         Training training = new Training();
         training.setUser(user);
-        MockHttpServletRequestBuilder request =  post("/training/add")
+        MockHttpServletRequestBuilder request = post("/training/add")
                 .flashAttr("training", training)
                 .param("id", "")
                 .param("name", "")
@@ -133,6 +131,7 @@ class TrainingControllerTest {
                 .andReturn();
         assertThat(trainingService.findAllTrainingsFromUser(user).size()).isEqualTo(2);
     }
+
     @Test
     @WithUserDetails("test")
     void shouldNotShowEditPlanFormWrongId() throws Exception {
@@ -145,7 +144,6 @@ class TrainingControllerTest {
     }
 
 
-
     @Test
     @WithUserDetails("test")
     void shouldEditPlanFormProcess() throws Exception {
@@ -153,7 +151,7 @@ class TrainingControllerTest {
         Training training = trainingService.getSingleTrainingById(4L, user);
         training.setName("testName");
         training.setDescription("testDescription");
-        MockHttpServletRequestBuilder request =  post("/training/edit/4")
+        MockHttpServletRequestBuilder request = post("/training/edit/4")
                 .flashAttr("training", training)
                 .param("id", training.getId().toString())
                 .param("name", training.getName())
@@ -169,13 +167,14 @@ class TrainingControllerTest {
         assertThat(editedTraining.getDescription()).isEqualTo(training.getDescription());
         assertThat(trainingService.findAllTrainingsFromUser(user).size()).isEqualTo(2);
     }
+
     @Test
     @WithUserDetails("test")
     void shouldNotEditPlanFormProcess() throws Exception {
         User user = userService.findByUserName("test");
         Training training = trainingService.getSingleTrainingById(4L, user);
         training.setName("");
-        MockHttpServletRequestBuilder request =  post("/training/edit/4")
+        MockHttpServletRequestBuilder request = post("/training/edit/4")
                 .flashAttr("training", training)
                 .param("id", training.getId().toString())
                 .param("name", training.getName())
@@ -188,6 +187,7 @@ class TrainingControllerTest {
                 .andReturn();
         assertThat(trainingService.findAllTrainingsFromUser(user).size()).isEqualTo(2);
     }
+
     @Test
     @WithUserDetails("test")
     void shouldShowSinglePlan() throws Exception {
@@ -197,11 +197,11 @@ class TrainingControllerTest {
                 .andExpect(status().is(200))
                 .andExpect(view().name("training/show"))
                 .andExpect(model().attribute("training", notNullValue()))
-                // @Todo
-                .andExpect(model().attribute("exercises", notNullValue()))
+                .andExpect(model().attribute("exercises", hasSize(2)))
                 .andReturn();
         assertThat(trainingService.findAllTrainingsFromUser(user).size()).isEqualTo(2);
     }
+
     @Test
     @WithUserDetails("test")
     void shouldNotShowSinglePlan() throws Exception {

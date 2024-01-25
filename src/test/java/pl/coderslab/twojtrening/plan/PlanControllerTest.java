@@ -13,8 +13,7 @@ import pl.coderslab.twojtrening.user.UserService;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -56,6 +55,7 @@ class PlanControllerTest {
         assertThat(planService.findAllPlansFromUser(user).size()).isEqualTo(1);
         planService.addPlan(Plan.builder().name("Plan 1").startDate(LocalDate.now()).weeks(4).user(user).build());
     }
+
     @Test
     @WithUserDetails("test")
     void shouldNotDeletePlan() throws Exception {
@@ -85,12 +85,12 @@ class PlanControllerTest {
         User user = userService.findByUserName("test");
         Plan plan = new Plan();
         plan.setUser(user);
-        MockHttpServletRequestBuilder request =  post("/plan/add")
+        MockHttpServletRequestBuilder request = post("/plan/add")
                 .flashAttr("plan", plan)
                 .param("id", "")
                 .param("name", "test")
                 .param("startDate", "2024-01-09")
-                .param("weeks","4")
+                .param("weeks", "4")
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())
@@ -108,12 +108,12 @@ class PlanControllerTest {
         User user = userService.findByUserName("test");
         Plan plan = new Plan();
         plan.setUser(user);
-        MockHttpServletRequestBuilder request =  post("/plan/add")
+        MockHttpServletRequestBuilder request = post("/plan/add")
                 .flashAttr("plan", plan)
                 .param("id", "")
                 .param("name", "")
                 .param("startDate", "2024-01-09")
-                .param("weeks","4")
+                .param("weeks", "4")
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())
@@ -135,6 +135,7 @@ class PlanControllerTest {
                 .andReturn();
         assertThat(planService.findAllPlansFromUser(user).size()).isEqualTo(2);
     }
+
     @Test
     @WithUserDetails("test")
     void shouldNotShowEditPlanFormWrongId() throws Exception {
@@ -150,39 +151,40 @@ class PlanControllerTest {
     @WithUserDetails("test")
     void shouldEditPlanFormProcess() throws Exception {
         User user = userService.findByUserName("test");
-        Plan plan = planService.getSinglePlanById(4L,user);
+        Plan plan = planService.getSinglePlanById(4L, user);
         plan.setName("testName");
         plan.setWeeks(10);
-        MockHttpServletRequestBuilder request =  post("/plan/edit/4")
+        MockHttpServletRequestBuilder request = post("/plan/edit/4")
                 .flashAttr("plan", plan)
                 .param("id", plan.getId().toString())
                 .param("name", plan.getName())
                 .param("startDate", plan.getStartDate().toString())
-                .param("weeks",String.valueOf(plan.getWeeks()))
+                .param("weeks", String.valueOf(plan.getWeeks()))
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())
                 .andExpect(status().is(302))
                 .andExpect(redirectedUrl("/plan/all"))
                 .andReturn();
-        Plan editedPlan = planService.getSinglePlanById(4L,user);
+        Plan editedPlan = planService.getSinglePlanById(4L, user);
         assertThat(editedPlan.getName()).isEqualTo(plan.getName());
         assertThat(editedPlan.getWeeks()).isEqualTo(plan.getWeeks());
         assertThat(planService.findAllPlansFromUser(user).size()).isEqualTo(2);
     }
+
     @Test
     @WithUserDetails("test")
     void shouldNotEditPlanFormProcess() throws Exception {
         User user = userService.findByUserName("test");
-        Plan plan = planService.getSinglePlanById(4L,user);
+        Plan plan = planService.getSinglePlanById(4L, user);
         plan.setName("");
         plan.setWeeks(10);
-        MockHttpServletRequestBuilder request =  post("/plan/edit/4")
+        MockHttpServletRequestBuilder request = post("/plan/edit/4")
                 .flashAttr("plan", plan)
                 .param("id", plan.getId().toString())
                 .param("name", plan.getName())
                 .param("startDate", plan.getStartDate().toString())
-                .param("weeks",String.valueOf(plan.getWeeks()))
+                .param("weeks", String.valueOf(plan.getWeeks()))
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())
@@ -191,6 +193,7 @@ class PlanControllerTest {
                 .andReturn();
         assertThat(planService.findAllPlansFromUser(user).size()).isEqualTo(2);
     }
+
     @Test
     @WithUserDetails("test")
     void shouldShowSinglePlan() throws Exception {
@@ -200,11 +203,11 @@ class PlanControllerTest {
                 .andExpect(status().is(200))
                 .andExpect(view().name("plan/show"))
                 .andExpect(model().attribute("plan", notNullValue()))
-                // @Todo
-                .andExpect(model().attribute("trainingsList", notNullValue()))
+                .andExpect(model().attribute("trainingsList", aMapWithSize(2)))
                 .andReturn();
         assertThat(planService.findAllPlansFromUser(user).size()).isEqualTo(2);
     }
+
     @Test
     @WithUserDetails("test")
     void shouldNotShowSinglePlan() throws Exception {

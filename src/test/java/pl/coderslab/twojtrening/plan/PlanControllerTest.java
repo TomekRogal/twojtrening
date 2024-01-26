@@ -156,10 +156,6 @@ class PlanControllerTest {
         plan.setWeeks(10);
         MockHttpServletRequestBuilder request = post("/plan/edit/4")
                 .flashAttr("plan", plan)
-                .param("id", plan.getId().toString())
-                .param("name", plan.getName())
-                .param("startDate", plan.getStartDate().toString())
-                .param("weeks", String.valueOf(plan.getWeeks()))
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())
@@ -181,10 +177,6 @@ class PlanControllerTest {
         plan.setWeeks(10);
         MockHttpServletRequestBuilder request = post("/plan/edit/4")
                 .flashAttr("plan", plan)
-                .param("id", plan.getId().toString())
-                .param("name", plan.getName())
-                .param("startDate", plan.getStartDate().toString())
-                .param("weeks", String.valueOf(plan.getWeeks()))
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())

@@ -97,18 +97,90 @@ class PlanTrainingControllerTest {
                 .andExpect(view().name("plantraining/add"))
                 .andReturn();
         assertThat(planService.getSinglePlanWithTrainingsAndExercisesById(plan.getId(),user).size()).isEqualTo(2);
+
     }
 
 
     @Test
-    void delete() {
+    @WithUserDetails("test")
+    void shouldDeletePlanTraining() throws Exception {
+        User user = userService.findByUserName("test");
+        Plan plan = planService.getSinglePlanById(4L, user);
+        Training training = trainingService.getSingleTrainingById(4L, user);
+        DayName dayName = dayNameRepository.findById(3L).get();
+        mockMvc.perform(get("/plan/training/delete/3"))
+                .andDo(print())
+                .andExpect(status().is(302))
+                .andExpect(redirectedUrl("/plan/show/4"))
+                .andReturn();
+        assertThat(planService.getSinglePlanWithTrainingsAndExercisesById(plan.getId(),user).size()).isEqualTo(1);
+        planTrainingService.addTrainingToPlan(PlanTraining.builder().plan(plan).training(training).dayName(dayName).week(3).build());
+    }
+    @Test
+    @WithUserDetails("test")
+    void shouldNotDeletePlanTrainingWrongId() throws Exception {
+        User user = userService.findByUserName("test");
+        Plan plan = planService.getSinglePlanById(4L, user);
+        mockMvc.perform(get("/plan/training/delete/10"))
+                .andDo(print())
+                .andExpect(status().is(404))
+                .andReturn();
+        assertThat(planService.getSinglePlanWithTrainingsAndExercisesById(plan.getId(),user).size()).isEqualTo(2);
     }
 
     @Test
-    void edit() {
+    @WithUserDetails("test")
+    void shouldShowEditTrainingToPlanForm() throws Exception {
+        User user = userService.findByUserName("test");
+        Plan plan = planService.getSinglePlanById(4L, user);
+        mockMvc.perform(get("/plan/training/edit/4"))
+                .andDo(print())
+                .andExpect(status().is(200))
+                .andExpect(view().name("plantraining/edit"))
+                .andExpect(model().attribute("trainings", hasSize(2)))
+                .andExpect(model().attribute("planTraining", notNullValue()))
+                .andExpect(model().attribute("days", hasSize(7)))
+                .andReturn();
+        assertThat(planService.getSinglePlanWithTrainingsAndExercisesById(plan.getId(),user).size()).isEqualTo(2);
+    }
+    @Test
+    @WithUserDetails("test")
+    void shouldEditPlanTrainingFormProcess() throws Exception {
+        User user = userService.findByUserName("test");
+        Plan plan = planService.getSinglePlanById(4L, user);
+        PlanTraining planTraining = planTrainingService.getSinglePlanWithTrainingsById(4L,user);
+        DayName dayName = dayNameRepository.findById(7L).get();
+        planTraining.setDayName(dayName);
+        planTraining.setWeek(8);
+        MockHttpServletRequestBuilder request = post("/plan/training/edit")
+                .flashAttr("planTraining", planTraining)
+                .with(csrf());
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().is(302))
+                .andExpect(redirectedUrl("/plan/show/4"))
+                .andReturn();
+        PlanTraining editetPlanTraining = planTrainingService.getSinglePlanWithTrainingsById(4L,user);
+        assertThat(editetPlanTraining.getDayName().getId()).isEqualTo(planTraining.getDayName().getId());
+        assertThat(editetPlanTraining.getWeek()).isEqualTo(planTraining.getWeek());
+        assertThat(planService.getSinglePlanWithTrainingsAndExercisesById(plan.getId(),user).size()).isEqualTo(2);
     }
 
     @Test
-    void editProcess() {
+    @WithUserDetails("test")
+    void shouldNotEditPlanTrainingFormProcess() throws Exception {
+        User user = userService.findByUserName("test");
+        Plan plan = planService.getSinglePlanById(4L, user);
+        PlanTraining planTraining = planTrainingService.getSinglePlanWithTrainingsById(4L,user);
+        planTraining.setWeek(-1);
+        MockHttpServletRequestBuilder request = post("/plan/training/edit")
+                .flashAttr("planTraining", planTraining)
+                .with(csrf());
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().is(200))
+                .andExpect(view().name("plantraining/edit"))
+                .andReturn();
+        assertThat(planService.getSinglePlanWithTrainingsAndExercisesById(plan.getId(),user).size()).isEqualTo(2);
     }
 }

@@ -153,9 +153,6 @@ class TrainingControllerTest {
         training.setDescription("testDescription");
         MockHttpServletRequestBuilder request = post("/training/edit/4")
                 .flashAttr("training", training)
-                .param("id", training.getId().toString())
-                .param("name", training.getName())
-                .param("description", training.getDescription())
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())
@@ -176,9 +173,6 @@ class TrainingControllerTest {
         training.setName("");
         MockHttpServletRequestBuilder request = post("/training/edit/4")
                 .flashAttr("training", training)
-                .param("id", training.getId().toString())
-                .param("name", training.getName())
-                .param("description", training.getDescription())
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())

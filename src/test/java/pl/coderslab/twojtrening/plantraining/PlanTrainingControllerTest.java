@@ -60,17 +60,14 @@ class PlanTrainingControllerTest {
     @WithUserDetails("test")
     void shouldAddTrainingToPlanFormProcess() throws Exception {
         User user = userService.findByUserName("test");
-        PlanTraining planTraining = new PlanTraining();
         Plan plan = planService.getSinglePlanById(4L, user);
         Training training = trainingService.getSingleTrainingById(4L, user);
         DayName dayName = dayNameRepository.findById(1L).get();
-        planTraining.setPlan(plan);
-        planTraining.setTraining(training);
-        planTraining.setDayName(dayName);
+        PlanTraining planTraining = PlanTraining.builder()
+                .plan(plan).week(1).training(training).dayName(dayName)
+                .build();
         MockHttpServletRequestBuilder request = post("/plan/training/add")
                 .flashAttr("planTraining", planTraining)
-                .param("id", "")
-                .param("week", "1")
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())
@@ -88,8 +85,6 @@ class PlanTrainingControllerTest {
         PlanTraining planTraining = new PlanTraining();
         MockHttpServletRequestBuilder request = post("/plan/training/add")
                 .flashAttr("planTraining", planTraining)
-                .param("id", "")
-                .param("week", "1")
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())

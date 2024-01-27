@@ -81,13 +81,11 @@ class TrainingControllerTest {
     @WithUserDetails("test")
     void shouldAddPlanFormProcess() throws Exception {
         User user = userService.findByUserName("test");
-        Training training = new Training();
-        training.setUser(user);
+        Training training = Training.builder()
+                .user(user).name("test").description("test")
+                .build();
         MockHttpServletRequestBuilder request = post("/training/add")
                 .flashAttr("training", training)
-                .param("id", "")
-                .param("name", "test")
-                .param("description", "test")
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())
@@ -103,13 +101,11 @@ class TrainingControllerTest {
     @WithUserDetails("test")
     void shouldNotAddPlanFormProcess() throws Exception {
         User user = userService.findByUserName("test");
-        Training training = new Training();
-        training.setUser(user);
+        Training training = Training.builder()
+                .user(user).name("").description("test")
+                .build();
         MockHttpServletRequestBuilder request = post("/training/add")
                 .flashAttr("training", training)
-                .param("id", "")
-                .param("name", "")
-                .param("description", "test")
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())

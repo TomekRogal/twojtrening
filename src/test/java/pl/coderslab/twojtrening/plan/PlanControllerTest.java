@@ -83,14 +83,12 @@ class PlanControllerTest {
     @WithUserDetails("test")
     void shouldAddPlanFormProcess() throws Exception {
         User user = userService.findByUserName("test");
-        Plan plan = new Plan();
-        plan.setUser(user);
+        Plan plan = Plan.builder()
+                .user(user).weeks(4).name("test")
+                .build();
         MockHttpServletRequestBuilder request = post("/plan/add")
                 .flashAttr("plan", plan)
-                .param("id", "")
-                .param("name", "test")
                 .param("startDate", "2024-01-09")
-                .param("weeks", "4")
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())
@@ -106,14 +104,13 @@ class PlanControllerTest {
     @WithUserDetails("test")
     void shouldNotAddPlanFormProcess() throws Exception {
         User user = userService.findByUserName("test");
-        Plan plan = new Plan();
-        plan.setUser(user);
+        Plan plan = Plan.builder()
+                .user(user).weeks(4).name("")
+                .build();
+
         MockHttpServletRequestBuilder request = post("/plan/add")
                 .flashAttr("plan", plan)
-                .param("id", "")
-                .param("name", "")
                 .param("startDate", "2024-01-09")
-                .param("weeks", "4")
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())

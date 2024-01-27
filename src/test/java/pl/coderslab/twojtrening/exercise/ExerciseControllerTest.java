@@ -74,12 +74,11 @@ class ExerciseControllerTest {
     @Test
     @WithUserDetails("test")
     void shouldAddExerciseFormProcess() throws Exception {
-        Exercise exercise = new Exercise();
+        Exercise exercise = Exercise.builder()
+                .name("test").description("test")
+                .build();
         MockHttpServletRequestBuilder request = post("/exercises/add")
                 .flashAttr("exercise", exercise)
-                .param("id", "")
-                .param("name", "test")
-                .param("description", "test")
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())
@@ -93,12 +92,11 @@ class ExerciseControllerTest {
     @Test
     @WithUserDetails("test")
     void shouldNotAddExerciseFormProcess() throws Exception {
-        Exercise exercise = new Exercise();
+        Exercise exercise = Exercise.builder()
+                .name("").description("test")
+                .build();
         MockHttpServletRequestBuilder request = post("/exercises/add")
                 .flashAttr("exercise", exercise)
-                .param("id", "")
-                .param("name", "")
-                .param("description", "test")
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())

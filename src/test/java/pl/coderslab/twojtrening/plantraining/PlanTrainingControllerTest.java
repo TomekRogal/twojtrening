@@ -109,7 +109,8 @@ class PlanTrainingControllerTest {
                 .andExpect(redirectedUrl("/plan/show/4"))
                 .andReturn();
         assertThat(planService.getSinglePlanWithTrainingsAndExercisesById(plan.getId(),user).size()).isEqualTo(1);
-        planTrainingService.addTrainingToPlan(PlanTraining.builder().plan(plan).training(training).dayName(dayName).week(3).build());
+        planTrainingService.addTrainingToPlan(PlanTraining.builder()
+                .plan(plan).training(training).dayName(dayName).week(3).build());
     }
     @Test
     @WithUserDetails("test")

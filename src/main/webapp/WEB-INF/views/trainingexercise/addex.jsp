@@ -23,7 +23,7 @@
                 <div class="col-lg-5">
                     <div class="card shadow-lg border-0 rounded-lg mt-5">
                         <form:form method="post"
-                                   modelAttribute="trainingExercise" action="/training/exercise/addex">
+                                   modelAttribute="trainingExercise" action="/training/exercise/addEx">
                             <form:hidden path="id"/>
                             <form:hidden path="exercise"/>
                             Trening: <form:select cssClass="form-control" itemLabel="name" itemValue="id"

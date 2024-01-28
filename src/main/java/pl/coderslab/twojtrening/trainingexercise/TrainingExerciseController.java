@@ -73,7 +73,7 @@ public class TrainingExerciseController {
         return "redirect:/training/show/" + trainingExercise.getTraining().getId();
     }
 
-    @GetMapping("/training/exercise/addex/{id}")
+    @GetMapping("/training/exercise/addEx/{id}")
     public String addex(@PathVariable Long id, Model model, @AuthenticationPrincipal CurrentUser customUser) {
         TrainingExercise trainingExercise = new TrainingExercise();
         trainingExercise.setExercise(exerciseService.getSingleExerciseById(id));
@@ -83,7 +83,7 @@ public class TrainingExerciseController {
 
     }
 
-    @PostMapping("/training/exercise/addex")
+    @PostMapping("/training/exercise/addEx")
     public String addexProcess(@Valid TrainingExercise trainingExercise, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "trainingexercise/addex";

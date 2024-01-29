@@ -146,6 +146,25 @@ class UserControllerTest {
         userService.saveNewUser(User.builder()
                 .username("user").password("user").build());
     }
+    @Test
+    @WithUserDetails("test")
+    void shouldNotDeleteUserWrongId() throws Exception {
+        mockMvc.perform(get("/users/delete/10"))
+                .andDo(print())
+                .andExpect(status().is(404))
+                .andReturn();
+        assertThat(userService.findAllUsers().size()).isEqualTo(2);
+    }
+    @Test
+    @WithUserDetails("test")
+    void shouldNotDeleteStillEnabledUser() throws Exception {
+        mockMvc.perform(get("/users/delete/4"))
+                .andDo(print())
+                .andExpect(status().is(302))
+                .andExpect(redirectedUrl("/users/all"))
+                .andReturn();
+        assertThat(userService.findAllUsers().size()).isEqualTo(2);
+    }
 
     @Test
     void userDetails() {

@@ -95,15 +95,15 @@ public class UserController {
     @PostMapping("/user/password")
     public String passwordProcess(@RequestParam String confirm, @RequestParam String old, @Valid User user, BindingResult bindingResult, Model model, @AuthenticationPrincipal CurrentUser customUser) {
         if (bindingResult.hasErrors()) {
-            return "/user/password";
+            return "user/password";
         }
-        if (!passwordEncoder.matches(old, userService.findLoggedUser(customUser.getUser()).getPassword())) {
+        if (passwordEncoder.matches(user.getPassword(),old)) {
             model.addAttribute("old", "failed");
-            return "/user/password";
+            return "user/password";
         }
         if (!user.getPassword().equals(confirm)) {
             model.addAttribute("pass", "failed");
-            return "/user/password";
+            return "user/password";
         }
 
         userService.saveNewUser(user);

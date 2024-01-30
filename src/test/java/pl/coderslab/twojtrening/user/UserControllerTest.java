@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -167,27 +168,179 @@ class UserControllerTest {
     }
 
     @Test
-    void userDetails() {
+    @WithUserDetails("test")
+    void shouldShowUserDetails() throws Exception {
+        mockMvc.perform(get("/user/details"))
+                .andDo(print())
+                .andExpect(status().is(200))
+                .andExpect(view().name("user/details"))
+                .andReturn();
     }
 
     @Test
-    void edit() {
+    @WithUserDetails
+    void shouldShowEditUsernameForm() throws Exception {
+        mockMvc.perform(get("/user/edit"))
+                .andDo(print())
+                .andExpect(status().is(200))
+                .andExpect(view().name("user/edit"))
+                .andExpect(model().attribute("user", notNullValue()))
+                .andReturn();
     }
 
     @Test
-    void editProcess() {
+    @WithUserDetails
+    void shouldEditUsernameFormProcess() throws Exception {
+        User user = userService.findByUserName("user");
+        user.setUsername("editedUser");
+        MockHttpServletRequestBuilder request = post("/user/edit")
+                .flashAttr("user", user)
+                .with(csrf());
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().is(302))
+                .andExpect(redirectedUrl("/"))
+                .andReturn();
+        assertThat(userService.findAllUsers().size()).isEqualTo(2);
+        assertThat(user.getUsername()).isEqualTo(userService.findLoggedUser(user).getUsername());
+        user.setUsername("user");
+        userService.saveUser(user);
+    }
+    @Test
+    @WithUserDetails
+    void shouldNotEditUsernameFormProcessWrongUsername() throws Exception {
+        User user = userService.findByUserName("user");
+        user.setUsername("");
+        MockHttpServletRequestBuilder request = post("/user/edit")
+                .flashAttr("user", user)
+                .with(csrf());
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().is(200))
+                .andExpect(view().name("user/edit"))
+                .andReturn();
+        assertThat(userService.findAllUsers().size()).isEqualTo(2);
+        assertNotEquals(user.getUsername(),userService.findLoggedUser(user).getUsername());
+    }
+    @Test
+    @WithUserDetails
+    void shouldNotEditUsernameFormProcessUsernameTaken() throws Exception {
+        User user = userService.findByUserName("user");
+        user.setUsername("test");
+        MockHttpServletRequestBuilder request = post("/user/edit")
+                .flashAttr("user", user)
+                .with(csrf());
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().is(200))
+                .andExpect(model().attribute("register", "failed"))
+                .andExpect(view().name("user/edit"))
+                .andReturn();
+        assertThat(userService.findAllUsers().size()).isEqualTo(2);
+        assertNotEquals(user.getUsername(),userService.findLoggedUser(user).getUsername());
     }
 
     @Test
-    void editPassword() {
+    @WithUserDetails
+    void shouldShowEditPasswordForm() throws Exception {
+        mockMvc.perform(get("/user/password"))
+                .andDo(print())
+                .andExpect(status().is(200))
+                .andExpect(view().name("user/password"))
+                .andExpect(model().attribute("user", notNullValue()))
+                .andReturn();
     }
 
     @Test
-    void passwordProcess() {
+    @WithUserDetails
+    void shouldEditPasswordFormProcess() throws Exception {
+        String password  = "editedPassword";
+        User user = userService.findByUserName("user");
+        user.setPassword(password);
+        MockHttpServletRequestBuilder request = post("/user/password")
+                .flashAttr("user", user)
+                .param("confirm",password)
+                .param("old",passwordEncoder.encode("user"))
+                .with(csrf());
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().is(302))
+                .andExpect(redirectedUrl("/"))
+                .andReturn();
+        assertThat(userService.findAllUsers().size()).isEqualTo(2);
+        assertThat(user.getPassword()).isEqualTo(userService.findLoggedUser(user).getPassword());
+        user.setPassword("user");
+        userService.saveUser(user);
+    }
+    @Test
+    @WithUserDetails
+    void shouldNotEditPasswordFormProcessWrongPassword() throws Exception {
+        String password  = "";
+        User user = userService.findByUserName("user");
+        user.setPassword(password);
+        MockHttpServletRequestBuilder request = post("/user/password")
+                .flashAttr("user", user)
+                .param("confirm",password)
+                .param("old",passwordEncoder.encode("user"))
+                .with(csrf());
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().is(200))
+                .andExpect(view().name("user/password"))
+                .andReturn();
+        assertThat(userService.findAllUsers().size()).isEqualTo(2);
+        assertNotEquals(user.getPassword(),userService.findLoggedUser(user).getPassword());
+    }
+    @Test
+    @WithUserDetails
+    void shouldNotEditPasswordFormProcessWrongPasswordConfirm() throws Exception {
+        String password  = "editedPassword";
+        User user = userService.findByUserName("user");
+        user.setPassword(password);
+        MockHttpServletRequestBuilder request = post("/user/password")
+                .flashAttr("user", user)
+                .param("confirm","wrongPassword")
+                .param("old",passwordEncoder.encode("user"))
+                .with(csrf());
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().is(200))
+                .andExpect(view().name("user/password"))
+                .andExpect(model().attribute("pass", "failed"))
+                .andReturn();
+        assertThat(userService.findAllUsers().size()).isEqualTo(2);
+        assertNotEquals(user.getPassword(),userService.findLoggedUser(user).getPassword());
     }
 
     @Test
-    void allUsers() {
+    @WithUserDetails
+    void shouldNotEditPasswordFormProcessNewPasswordSameAsOld() throws Exception {
+        String password  = "user";
+        User user = userService.findByUserName("user");
+        user.setPassword(password);
+        MockHttpServletRequestBuilder request = post("/user/password")
+                .flashAttr("user", user)
+                .param("confirm",password)
+                .param("old",passwordEncoder.encode(password))
+                .with(csrf());
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().is(200))
+                .andExpect(view().name("user/password"))
+                .andExpect(model().attribute("old", "failed"))
+                .andReturn();
+        assertThat(userService.findAllUsers().size()).isEqualTo(2);
+    }
+
+    @Test
+    @WithUserDetails("test")
+    void shouldShowAllUsers() throws Exception {
+        mockMvc.perform(get("/users/all"))
+                .andDo(print())
+                .andExpect(status().is(200))
+                .andExpect(view().name("user/all"))
+                .andExpect(model().attribute("users", hasSize(2)))
+                .andReturn();
     }
 
     @Test

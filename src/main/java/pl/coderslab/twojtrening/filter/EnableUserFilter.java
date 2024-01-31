@@ -1,4 +1,4 @@
-package pl.coderslab.twojtrening;
+package pl.coderslab.twojtrening.filter;
 
 import pl.coderslab.twojtrening.user.User;
 

@@ -1,4 +1,4 @@
-package pl.coderslab.twojtrening.user;
+package pl.coderslab.twojtrening.security;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -6,6 +6,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import pl.coderslab.twojtrening.user.CurrentUser;
+import pl.coderslab.twojtrening.user.User;
+import pl.coderslab.twojtrening.user.UserService;
 
 import java.util.HashSet;
 import java.util.Set;

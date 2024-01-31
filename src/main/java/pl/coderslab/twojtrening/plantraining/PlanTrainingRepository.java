@@ -16,5 +16,5 @@ public interface PlanTrainingRepository extends JpaRepository<PlanTraining, Long
     @Modifying
     @Transactional
     @Query("delete PlanTraining pt where pt.plan = ?1")
-    int deleteAllFromPlan(Plan plan);
+    void deleteAllFromPlan(Plan plan);
 }

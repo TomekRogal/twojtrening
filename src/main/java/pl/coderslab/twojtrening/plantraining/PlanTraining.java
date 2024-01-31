@@ -1,5 +1,8 @@
 package pl.coderslab.twojtrening.plantraining;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import pl.coderslab.twojtrening.dayname.DayName;
 import pl.coderslab.twojtrening.plan.Plan;
 import pl.coderslab.twojtrening.training.Training;
@@ -8,7 +11,9 @@ import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class PlanTraining {
     @Id

@@ -1,4 +1,4 @@
-package pl.coderslab.twojtrening;
+package pl.coderslab.twojtrening.home;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -18,7 +18,7 @@ public class HomeController {
     }
 
     @GetMapping("/")
-    public String hello(@AuthenticationPrincipal CurrentUser customUser, Model model) {
+    public String home(@AuthenticationPrincipal CurrentUser customUser, Model model) {
         if (customUser != null) {
             model.addAttribute("loggedUser", userRepository.findById(customUser.getUser().getId()).get());
         }

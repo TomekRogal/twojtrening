@@ -15,5 +15,5 @@ public interface TrainingExerciseRepository extends JpaRepository<TrainingExerci
     @Modifying
     @Transactional
     @Query("delete TrainingExercise te where te.training = ?1")
-    int deleteAllFromTraining(Training training);
+    void deleteAllFromTraining(Training training);
 }

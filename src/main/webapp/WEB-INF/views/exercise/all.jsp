@@ -50,7 +50,7 @@
                                     </a>
                                 </sec:authorize>
                                 <sec:authorize access="isAuthenticated()">
-                                    <a href="/training/exercise/addex/${exercise.id}">
+                                    <a href="/training/exercise/addEx/${exercise.id}">
                                         <button type="button" class="btn btn-primary">Dodaj do treningu</button>
                                     </a>
                                 </sec:authorize>

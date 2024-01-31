@@ -1,4 +1,4 @@
-package pl.coderslab.twojtrening;
+package pl.coderslab.twojtrening.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +21,7 @@ public class SecurityConfig {
     protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers("/plan/**", "/training/**", "/user/**","/activate").hasAnyRole("USER", "ADMIN")
-                .antMatchers("/exercises/**", "users/**").hasRole("ADMIN")
+                .antMatchers("/exercises/**", "/users/**").hasRole("ADMIN")
                 .and().formLogin().loginPage("/login").defaultSuccessUrl("/", true)
                 .and().logout().logoutSuccessUrl("/")
                 .permitAll()

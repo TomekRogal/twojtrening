@@ -1,7 +1,5 @@
 package pl.coderslab.twojtrening.user;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -10,16 +8,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import pl.coderslab.twojtrening.role.Role;
-import pl.coderslab.twojtrening.role.RoleRepository;
-
-import java.util.Arrays;
-import java.util.HashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -38,8 +30,6 @@ class UserControllerTest {
     private UserRepository userRepository;
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
-    @Autowired
-    private RoleRepository roleRepository;
 
     @Test
     void shouldShowLoginForm() throws Exception {
@@ -49,6 +39,7 @@ class UserControllerTest {
                 .andExpect(view().name("user/login"))
                 .andReturn();
     }
+
     @Test
     void shouldShowRegisterForm() throws Exception {
         mockMvc.perform(get("/register"))
@@ -67,7 +58,7 @@ class UserControllerTest {
                 .build();
         MockHttpServletRequestBuilder request = post("/register")
                 .flashAttr("user", user)
-                .param("confirm",password)
+                .param("confirm", password)
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())
@@ -86,7 +77,7 @@ class UserControllerTest {
                 .build();
         MockHttpServletRequestBuilder request = post("/register")
                 .flashAttr("user", user)
-                .param("confirm",password)
+                .param("confirm", password)
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())
@@ -95,6 +86,7 @@ class UserControllerTest {
                 .andReturn();
         assertThat(userService.findAllUsers().size()).isEqualTo(2);
     }
+
     @Test
     void shouldNotRegisterNewUserUsernameTaken() throws Exception {
         String password = "testUser";
@@ -103,7 +95,7 @@ class UserControllerTest {
                 .build();
         MockHttpServletRequestBuilder request = post("/register")
                 .flashAttr("user", user)
-                .param("confirm",password)
+                .param("confirm", password)
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())
@@ -113,6 +105,7 @@ class UserControllerTest {
                 .andReturn();
         assertThat(userService.findAllUsers().size()).isEqualTo(2);
     }
+
     @Test
     void shouldNotRegisterNewUserWrongPasswordConfirm() throws Exception {
         String password = "testUser";
@@ -121,7 +114,7 @@ class UserControllerTest {
                 .build();
         MockHttpServletRequestBuilder request = post("/register")
                 .flashAttr("user", user)
-                .param("confirm","wrongPassword")
+                .param("confirm", "wrongPassword")
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())
@@ -147,6 +140,7 @@ class UserControllerTest {
         userService.saveNewUser(User.builder()
                 .username("user").password("user").build());
     }
+
     @Test
     @WithUserDetails("test")
     void shouldNotDeleteUserWrongId() throws Exception {
@@ -156,6 +150,7 @@ class UserControllerTest {
                 .andReturn();
         assertThat(userService.findAllUsers().size()).isEqualTo(2);
     }
+
     @Test
     @WithUserDetails("test")
     void shouldNotDeleteStillEnabledUser() throws Exception {
@@ -206,6 +201,7 @@ class UserControllerTest {
         user.setUsername("user");
         userService.saveUser(user);
     }
+
     @Test
     @WithUserDetails
     void shouldNotEditUsernameFormProcessWrongUsername() throws Exception {
@@ -220,8 +216,9 @@ class UserControllerTest {
                 .andExpect(view().name("user/edit"))
                 .andReturn();
         assertThat(userService.findAllUsers().size()).isEqualTo(2);
-        assertNotEquals(user.getUsername(),userService.findLoggedUser(user).getUsername());
+        assertNotEquals(user.getUsername(), userService.findLoggedUser(user).getUsername());
     }
+
     @Test
     @WithUserDetails
     void shouldNotEditUsernameFormProcessUsernameTaken() throws Exception {
@@ -237,7 +234,7 @@ class UserControllerTest {
                 .andExpect(view().name("user/edit"))
                 .andReturn();
         assertThat(userService.findAllUsers().size()).isEqualTo(2);
-        assertNotEquals(user.getUsername(),userService.findLoggedUser(user).getUsername());
+        assertNotEquals(user.getUsername(), userService.findLoggedUser(user).getUsername());
     }
 
     @Test
@@ -254,13 +251,13 @@ class UserControllerTest {
     @Test
     @WithUserDetails
     void shouldEditPasswordFormProcess() throws Exception {
-        String password  = "editedPassword";
+        String password = "editedPassword";
         User user = userService.findByUserName("user");
         user.setPassword(password);
         MockHttpServletRequestBuilder request = post("/user/password")
                 .flashAttr("user", user)
-                .param("confirm",password)
-                .param("old",passwordEncoder.encode("user"))
+                .param("confirm", password)
+                .param("old", passwordEncoder.encode("user"))
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())
@@ -272,16 +269,17 @@ class UserControllerTest {
         user.setPassword("user");
         userService.saveUser(user);
     }
+
     @Test
     @WithUserDetails
     void shouldNotEditPasswordFormProcessWrongPassword() throws Exception {
-        String password  = "";
+        String password = "";
         User user = userService.findByUserName("user");
         user.setPassword(password);
         MockHttpServletRequestBuilder request = post("/user/password")
                 .flashAttr("user", user)
-                .param("confirm",password)
-                .param("old",passwordEncoder.encode("user"))
+                .param("confirm", password)
+                .param("old", passwordEncoder.encode("user"))
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())
@@ -289,18 +287,19 @@ class UserControllerTest {
                 .andExpect(view().name("user/password"))
                 .andReturn();
         assertThat(userService.findAllUsers().size()).isEqualTo(2);
-        assertNotEquals(user.getPassword(),userService.findLoggedUser(user).getPassword());
+        assertNotEquals(user.getPassword(), userService.findLoggedUser(user).getPassword());
     }
+
     @Test
     @WithUserDetails
     void shouldNotEditPasswordFormProcessWrongPasswordConfirm() throws Exception {
-        String password  = "editedPassword";
+        String password = "editedPassword";
         User user = userService.findByUserName("user");
         user.setPassword(password);
         MockHttpServletRequestBuilder request = post("/user/password")
                 .flashAttr("user", user)
-                .param("confirm","wrongPassword")
-                .param("old",passwordEncoder.encode("user"))
+                .param("confirm", "wrongPassword")
+                .param("old", passwordEncoder.encode("user"))
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())
@@ -309,19 +308,19 @@ class UserControllerTest {
                 .andExpect(model().attribute("pass", "failed"))
                 .andReturn();
         assertThat(userService.findAllUsers().size()).isEqualTo(2);
-        assertNotEquals(user.getPassword(),userService.findLoggedUser(user).getPassword());
+        assertNotEquals(user.getPassword(), userService.findLoggedUser(user).getPassword());
     }
 
     @Test
     @WithUserDetails
     void shouldNotEditPasswordFormProcessNewPasswordSameAsOld() throws Exception {
-        String password  = "user";
+        String password = "user";
         User user = userService.findByUserName("user");
         user.setPassword(password);
         MockHttpServletRequestBuilder request = post("/user/password")
                 .flashAttr("user", user)
-                .param("confirm",password)
-                .param("old",passwordEncoder.encode(password))
+                .param("confirm", password)
+                .param("old", passwordEncoder.encode(password))
                 .with(csrf());
         mockMvc.perform(request)
                 .andDo(print())
@@ -344,18 +343,70 @@ class UserControllerTest {
     }
 
     @Test
-    void activate() {
+    @WithUserDetails
+    void shouldShowActivateUserForm() throws Exception {
+        User user = userService.findByUserName("user");
+        user.setEnabled(0);
+        userService.saveUser(user);
+        mockMvc.perform(get("/activate"))
+                .andDo(print())
+                .andExpect(status().is(200))
+                .andExpect(view().name("user/activate"))
+                .andReturn();
+        assertThat(userService.findByUserName("user").getEnabled()).isEqualTo(user.getEnabled());
+        user.setEnabled(1);
+        userService.saveUser(user);
     }
 
     @Test
-    void activateProcess() {
+    @WithUserDetails
+    void shouldNotShowActivateUserForm() throws Exception {
+        User user = userService.findByUserName("user");
+        mockMvc.perform(get("/activate"))
+                .andDo(print())
+                .andExpect(status().is(302))
+                .andExpect(redirectedUrl("/"))
+                .andReturn();
+        assertThat(userService.findByUserName("user").getEnabled()).isEqualTo(user.getEnabled());
     }
 
     @Test
-    void inactivate() {
+    @WithUserDetails
+    void shouldActivateUser() throws Exception {
+        User user = userService.findByUserName("user");
+        user.setEnabled(0);
+        userService.saveUser(user);
+        mockMvc.perform(post("/activate")
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().is(302))
+                .andExpect(redirectedUrl("/"))
+                .andReturn();
+        assertThat(userService.findByUserName("user").getEnabled()).isEqualTo(1);
     }
 
     @Test
-    void inactivateProcess() {
+    @WithUserDetails
+    void shouldShowInactivateUserForm() throws Exception {
+        mockMvc.perform(get("/user/inactivate"))
+                .andDo(print())
+                .andExpect(status().is(200))
+                .andExpect(view().name("user/inactivate"))
+                .andReturn();
+    }
+
+    @Test
+    @WithUserDetails
+    void shouldInactivateUser() throws Exception {
+        User user = userService.findByUserName("user");
+        mockMvc.perform(post("/user/inactivate")
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().is(302))
+                .andExpect(redirectedUrl("/"))
+                .andReturn();
+        assertThat(userService.findByUserName("user").getEnabled()).isEqualTo(0);
+        user.setEnabled(1);
+        userService.saveUser(user);
     }
 }

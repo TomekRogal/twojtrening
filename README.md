@@ -19,3 +19,5 @@ The aim of the project is to create an application in which everyone can plan th
 
 # App
 
+#### 1 - Starting page
+![alt text](https://github.com/TomekRogal/your_training/blob/main/screenshots/main.PNG?raw=true)
